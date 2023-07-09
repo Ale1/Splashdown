@@ -90,14 +90,14 @@ namespace Splashdown
         private static void AddText(Texture2D texture, string text, int yPosition)
         {
             //todo: use max text width instead of number of characters to decide if truncation is necessary. 
-            //remarks: right now since CourierNew is monospaced, text character count is good measure of width, but to support other fonts will need to add individual characer widths.
+            //remarks: right now since current font is monospaced, text character count is good measure of width, but to support other fonts will need to add individual characer widths.
             if (text.Length > 10)
             {
                 text = text.Substring(0, 10);
                 Debug.LogWarning($"Splashdown ::: text is too long to fit, will be truncated: '{text}...'");
             }
 
-            //var font = Font.CreateDynamicFontFromOSFont("Courier New", FontSize);
+            //var font = Font.CreateDynamicFontFromOSFont("Courier New", FontSize); //todo: fallback to system font if custom one not found.
             Font font = AssetDatabase.LoadAssetAtPath<Font>("Packages/com.coldtower.splashdown/Editor/Splashdown_RobotoMono.ttf");
             if (font == null)
                 Debug.Log("no font found");
@@ -159,8 +159,7 @@ namespace Splashdown
             textTexture.Apply();
 
             Color[] pixels = textTexture.GetPixels();
-
-            //texture.SetPixels(0, yPosition, textTexture.width, textTexture.height, pixels);
+            
             texture.SetPixels(0, yPosition, textTexture.width, textTexture.height, pixels);
 
             RenderTexture.active = null;

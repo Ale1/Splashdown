@@ -1,0 +1,20 @@
+{
+  "name": "com.coldtower.splashdown",
+  "version": "0.1.0",
+  "displayName": "Splashdown",
+  "description": "Custom Runtime Splash and Icon generator",
+  "documentationUrl": "",
+  "changelogUrl": "CHANGELOG.MD",
+  "licensesUrl": "LICENCE.MD",
+  "keywords": [
+    "Utils",
+    "Coldtower"
+  ],
+  "author": {
+    "name": "Alejandro Barbero",
+    "email": "alejadro.barbero@gmail.com",
+    "url": ""
+  },
+  "unity": "2021.3",
+  "unityRelease": "0f1"
+}

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Android;
@@ -14,16 +15,32 @@ namespace Splashdown
     {
         private static PlayerSettings.SplashScreenLogo[] backupLogos;
         private static Dictionary<PlatformIconKind,PlatformIcon[]> backupIcons;
-
-        [MenuItem("Splashdown/Generate")]
+        
+        [MenuItem("Assets/Create/Splashdown/Icon")]
         public static void Generate()
         {
-            SpriteGenerator.Generate();
-        }
+            
+            string targetDirectory = AssetDatabase.GetAssetPath(Selection.activeObject);
+            if (Path.GetExtension(targetDirectory) != "") 
+            {
+                targetDirectory = targetDirectory.Replace(Path.GetFileName(AssetDatabase.GetAssetPath(Selection.activeObject)), "");
+            }
 
+            var path = Path.Combine(targetDirectory, Config.filename);
+            var sprite = SpriteGenerator.Generate(path);
+  
+            if (sprite != null)
+            {
+                var guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(sprite));
+                
+                //EditorPrefs.SetString("Splashdown/spriteGUID",guid);
+                
+            }
+        }
+        
         public static void Run()
         {
-            var sprite = SpriteGenerator.Generate();
+            var sprite = SpriteGenerator.Generate(Path.Combine("Assets", Config.filename));
             
             if (sprite == null)
             {

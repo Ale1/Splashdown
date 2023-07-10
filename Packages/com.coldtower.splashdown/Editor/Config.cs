@@ -24,13 +24,11 @@ namespace Splashdown
         public static int PreBuildCallbackOrder = 9999;
         public const int PostbuildCallbackOrder = 1;
 
-        public static string Path = "generatedSprite.png";
+        public static string filename = "generatedSprite.png";
     }
 
     public static class ConfigUtil
     {
-        
-        public static string AssetsPath = Path.Combine("Assets", Config.Path);
         public static bool hasLine1 => !string.IsNullOrEmpty(Config.line1);
         public static bool hasLine2 => !string.IsNullOrEmpty(Config.line2);
         public static bool hasLine3 => !string.IsNullOrEmpty(Config.line3);

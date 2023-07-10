@@ -1,7 +1,9 @@
 using System;
 using UnityEngine;
 using System.IO;
+using Codice.Client.BaseCommands.Merge.Xml;
 using UnityEditor;
+using UnityEngine.TestTools;
 
 namespace Splashdown
 { 
@@ -9,7 +11,7 @@ namespace Splashdown
     {
         private static Texture2D texture;
 
-        public static Sprite Generate()
+        public static Sprite Generate(string targetPath)
         {
             // Create a new texture
             texture = new Texture2D(360, 360, TextureFormat.RGBA32, false);
@@ -64,25 +66,26 @@ namespace Splashdown
             // Save texture to PNG
             byte[] bytes = texture.EncodeToPNG();
 
-            string fullpath = Path.Combine(Application.dataPath, Config.Path);
+            string fullpath =  targetPath.Replace("Assets", Application.dataPath);
+            Debug.Log(fullpath);
 
             //create parent directory if doesnt exist
             Directory.CreateDirectory(Path.GetDirectoryName(fullpath) ?? throw new InvalidOperationException());
             
             File.WriteAllBytes(fullpath, bytes);
 
-            if (Config.logging) Debug.Log("Texture saved at: " + ConfigUtil.AssetsPath);
+            if (Config.logging) Debug.Log("Texture saved at: " + fullpath);
             AssetDatabase.Refresh();
 
             //Reimport asset converting Default Texture2D to textureType "Sprite".
-            TextureImporter importer = (TextureImporter)AssetImporter.GetAtPath(ConfigUtil.AssetsPath);
+            TextureImporter importer = (TextureImporter)AssetImporter.GetAtPath(targetPath);
             importer.textureType = TextureImporterType.Sprite;
             importer.textureCompression = TextureImporterCompression.Uncompressed;
             EditorUtility.SetDirty(importer);
             importer.SaveAndReimport();
             
-            var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(ConfigUtil.AssetsPath);
-            if(Config.logging && sprite == null) Debug.LogError($"Splashdown ::: could not load sprite at {ConfigUtil.AssetsPath}");
+            var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(targetPath);
+            if(Config.logging && sprite == null) Debug.LogError($"Splashdown ::: could not load sprite at {targetPath}");
             return sprite;
         }
 

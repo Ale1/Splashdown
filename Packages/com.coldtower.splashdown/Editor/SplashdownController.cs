@@ -18,25 +18,37 @@ namespace Splashdown
 
         private static bool restoreSplash;
         private static bool restoreIcons;
-        
-        
+
+
         [MenuItem("Assets/Create/Splashdown/Icon")]
         public static void GenerateIcon()
         {
-            string targetDirectory = AssetDatabase.GetAssetPath(Selection.activeObject);
-
-            if (string.IsNullOrEmpty(targetDirectory))
+            GenerateIcon(AssetDatabase.GetAssetPath(Selection.activeObject));
+        }
+        
+        private static void GenerateIcon(string targetPath)
+        {
+            if (string.IsNullOrEmpty(targetPath))
             {
-                targetDirectory = "Assets";
+                targetPath = "Assets";
             }
-            else if (Path.GetExtension(targetDirectory) != "") 
+            else if (Directory.Exists(targetPath)) // its a directory.
             {
-                targetDirectory = targetDirectory.Replace(Path.GetFileName(AssetDatabase.GetAssetPath(Selection.activeObject)), "");
+                targetPath = Path.Combine(targetPath, Config.filename);
+            }
+            else if (Path.GetExtension(targetPath) == ".png")
+            {
+                // keep path as it is, to replace file.
+            }
+            else if (Path.GetExtension(targetPath) != "") //path is pointing to a non-png file.  Use same location but use default filename.
+            {
+                targetPath = targetPath.Replace(Path.GetFileName(AssetDatabase.GetAssetPath(Selection.activeObject)), "");
+                targetPath = Path.Combine(targetPath, Config.filename);
             }
             
-
-            var path = Path.Combine(targetDirectory, Config.filename);
-            var sprite = SpriteGenerator.Generate(path);
+            Debug.Log(targetPath);
+            
+            var sprite = SpriteGenerator.Generate(targetPath);
   
             if (sprite != null)
             {
@@ -54,7 +66,7 @@ namespace Splashdown
                 var lastSprite = GetGUIDFromPrefs("Splashdown/logoGUID");
                 var oldPath = AssetDatabase.GUIDToAssetPath(lastSprite);
                 GenerateIcon(oldPath);
-                sprite = FetchSpriteFromPrefs("Splashdown/logoGUID");
+                var sprite = FetchSpriteFromPrefs("Splashdown/logoGUID");
                 var shouldRestore = SetSplash(sprite);
                 restoreSplash = shouldRestore;
             }
@@ -64,7 +76,7 @@ namespace Splashdown
                 var sprite = FetchSpriteFromPrefs("Splashdown/iconGUID");
                 if (sprite == null)
                 {
-                    GenerateIcon();
+                    GenerateIcon("Assets");
                     sprite = FetchSpriteFromPrefs("Splashdown/iconGUID");
                 }
                 var shouldRestore = SetIcons(sprite);

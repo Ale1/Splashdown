@@ -104,7 +104,7 @@ namespace Splashdown
             }
 
             //var font = Font.CreateDynamicFontFromOSFont("Courier New", FontSize); //todo: fallback to system font if custom one not found.
-            Font font = AssetDatabase.LoadAssetAtPath<Font>("Packages/com.coldtower.splashdown/Editor/Splashdown_RobotoMono.ttf");
+            Font font = AssetDatabase.LoadAssetAtPath<Font>("Packages/com.Ale1.splashdown/Editor/Splashdown_RobotoMono.ttf");
             if (font == null)
                 Debug.Log("no font found");
 

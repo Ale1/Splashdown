@@ -13,18 +13,27 @@ namespace Splashdown
 {
     public static class SplashdownController
     {
-        private static PlayerSettings.SplashScreenLogo[] backupLogos;
-        private static Dictionary<PlatformIconKind,PlatformIcon[]> backupIcons;
+        private static PlayerSettings.SplashScreenLogo[] _backupLogos;
+        private static Dictionary<PlatformIconKind,PlatformIcon[]> _backupIcons;
+
+        private static bool restoreSplash;
+        private static bool restoreIcons;
+        
         
         [MenuItem("Assets/Create/Splashdown/Icon")]
-        public static void Generate()
+        public static void GenerateIcon()
         {
-            
             string targetDirectory = AssetDatabase.GetAssetPath(Selection.activeObject);
-            if (Path.GetExtension(targetDirectory) != "") 
+
+            if (string.IsNullOrEmpty(targetDirectory))
+            {
+                targetDirectory = "Assets";
+            }
+            else if (Path.GetExtension(targetDirectory) != "") 
             {
                 targetDirectory = targetDirectory.Replace(Path.GetFileName(AssetDatabase.GetAssetPath(Selection.activeObject)), "");
             }
+            
 
             var path = Path.Combine(targetDirectory, Config.filename);
             var sprite = SpriteGenerator.Generate(path);
@@ -32,87 +41,146 @@ namespace Splashdown
             if (sprite != null)
             {
                 var guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(sprite));
-                
-                //EditorPrefs.SetString("Splashdown/spriteGUID",guid);
-                
+                EditorPrefs.SetString("Splashdown/logoGUID",guid);
+                EditorPrefs.SetString("Splashdown/iconGUID", guid);
             }
         }
-        
-        public static void Run()
+
+        public static void Build()
         {
-            var sprite = SpriteGenerator.Generate(Path.Combine("Assets", Config.filename));
-            
-            if (sprite == null)
-            {
-                if(Config.logging) Debug.LogError("could not find asset");
-                return;
+            if (Config.replaceSplash)
+            { 
+                //reuse old path if possible to override generatedSprite.
+                var lastSprite = GetGUIDFromPrefs("Splashdown/logoGUID");
+                var oldPath = AssetDatabase.GUIDToAssetPath(lastSprite);
+                GenerateIcon(oldPath);
+                sprite = FetchSpriteFromPrefs("Splashdown/logoGUID");
+                var shouldRestore = SetSplash(sprite);
+                restoreSplash = shouldRestore;
             }
             
-            if(Config.replaceSplash) SetSplash(sprite);
-            if(Config.replaceIcon) SetIcons(sprite);
+            if (Config.replaceIcon)
+            {
+                var sprite = FetchSpriteFromPrefs("Splashdown/iconGUID");
+                if (sprite == null)
+                {
+                    GenerateIcon();
+                    sprite = FetchSpriteFromPrefs("Splashdown/iconGUID");
+                }
+                var shouldRestore = SetIcons(sprite);
+                restoreIcons = shouldRestore;
+            }
         }
 
 
         public static void Restore()
         {
-            RestoreLogos();
-            RestoreIcons();
+            if(restoreSplash) RestoreSplash();
+            if(restoreIcons) RestoreIcons();
+            AssetDatabase.SaveAssets();
         }
 
-        private static void SetSplash(Sprite sprite)
+        private static Sprite FetchSpriteFromPrefs(string key)
         {
-            var splashdownLogo =
-                    PlayerSettings.SplashScreenLogo.Create(Config.splashTime, sprite); 
-                PlayerSettings.SplashScreenLogo[] backupLogos = PlayerSettings.SplashScreen.logos;
-
-                if (!backupLogos.Contains(splashdownLogo))
+            var spriteGUID = GetGUIDFromPrefs(key);
+            if (spriteGUID != "")
+            {
+                var path = AssetDatabase.GUIDToAssetPath(spriteGUID);
+                if (path != "")
                 {
-                    var tempLogos = backupLogos.PushToArray(splashdownLogo);
-                    PlayerSettings.SplashScreen.logos = tempLogos;
+                    var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+                    return sprite;   
                 }
+            }
+            return null;
+        }
+
+        private static string GetGUIDFromPrefs(string key)
+        {
+            return EditorPrefs.GetString(key, "");
+        }
+
+        private static bool SetSplash(Sprite sprite)
+        {
+            PlayerSettings.SplashScreenLogo[] backupLogos = PlayerSettings.SplashScreen.logos;
+            
+            if (sprite == null)
+            {
+                if(Config.logging) Debug.LogError("could not find splash logo");
+                return false;
+            }
+            
+            var splashdownLogo = PlayerSettings.SplashScreenLogo.Create(Config.splashTime, sprite);
+
+            if (!backupLogos.Contains(splashdownLogo))
+            {
+                var tempLogos = backupLogos.PushToArray(splashdownLogo);
+                PlayerSettings.SplashScreen.logos = tempLogos;
+            }
+            return true;
         }
 
 
-        private static void SetIcons(Sprite sprite)
+        private static bool SetIcons(Sprite sprite)
         {
             var transparentBackground = AssetDatabase.LoadAssetAtPath<Texture2D>("Packages/com.coldtower.splashdown/Editor/splashdown_transparent.png");
+
+            if (sprite == null || transparentBackground == null)
+            {
+                if(Config.logging) Debug.LogError("error loading sprites");
+                return false;
+            }
             
-                if (FetchPlatform(out NamedBuildTarget platform) && FetchIconKind(out PlatformIconKind[] kinds))
+
+            NamedBuildTarget platform;
+            PlatformIconKind[] kinds;
+            if (!FetchPlatform(out platform) || !FetchIconKind(out kinds))
+            {
+                return false;
+            }
+
+            //fill backup icons dictionary.  
+            _backupIcons = new Dictionary<PlatformIconKind, PlatformIcon[]>();
+            foreach (var kind in kinds)
+            {
+                var icons = PlayerSettings.GetPlatformIcons(platform, kind);
+                _backupIcons[kind] = icons;
+            }
+            
+            
+            foreach (var kind in kinds)
+            {
+                var icons = PlayerSettings.GetPlatformIcons(platform, kind);
+                //Assign textures to each available icon slot.
+                for (int i = 0; i < icons.Length; i++)
                 {
-                    foreach (var kind in kinds)
-                    {
-                        var icons = PlayerSettings.GetPlatformIcons(platform, kind);
-                        backupIcons[kind] = icons;
-
-                        //Assign textures to each available icon slot.
-                        for (int i = 0; i < icons.Length; i++)
-                        {
-                            var size = icons[i].maxLayerCount; // amount of textures expected
-                            var splashdownIconArray = new Texture2D[size];
-                            int index = size > 1 ? 1 : 0;
-                            splashdownIconArray[0] = transparentBackground; // background transparent by default
-                            splashdownIconArray[index] = sprite.texture; //set foreground to splashdown
-                            icons[i].SetTextures(splashdownIconArray);
-                        }
-
-                        PlayerSettings.SetPlatformIcons(platform, kind, icons);
-                    }
+                    var size = icons[i].maxLayerCount; // amount of textures expected
+                    var splashdownIconArray = new Texture2D[size];
+                    int index = size > 1 ? 1 : 0;
+                    splashdownIconArray[0] = transparentBackground; // background transparent by default
+                    splashdownIconArray[index] = sprite.texture; //set foreground to splashdown
+                    icons[i].SetTextures(splashdownIconArray);
                 }
+
+                PlayerSettings.SetPlatformIcons(platform, kind, icons);
+            }
+
+            return true;
         }
 
-        private static void RestoreLogos()
+        private static void RestoreSplash()
         {
-            if(Config.replaceIcon)
-                PlayerSettings.SplashScreen.logos = backupLogos;
+            if(Config.replaceSplash)
+                PlayerSettings.SplashScreen.logos = _backupLogos;
         }
 
         private static void RestoreIcons()
         {
-            if (Config.replaceSplash)
+            if (Config.replaceIcon)
             {
                 if (FetchPlatform(out NamedBuildTarget platform))
                 {
-                    foreach (var entry in backupIcons)
+                    foreach (var entry in _backupIcons)
                     {
                         PlayerSettings.SetPlatformIcons(platform, entry.Key, entry.Value);
                     }
@@ -136,6 +204,7 @@ namespace Splashdown
                     kinds = new[] { iOSPlatformIconKind.Application };
                     return true;
                 default:
+                    if(Config.logging) Debug.LogError("unsupported platform");
                     kinds = null;
                     return false;
             }

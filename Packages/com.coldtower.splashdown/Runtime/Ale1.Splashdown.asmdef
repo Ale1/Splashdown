@@ -1,6 +1,6 @@
 {
-    "name": "Coldtower.Splashdown",
-    "rootNamespace": "Coldtower.Common",
+    "name": "Ale1.Splashdown",
+    "rootNamespace": "Ale1.Splashdown",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

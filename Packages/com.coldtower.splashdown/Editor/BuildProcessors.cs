@@ -2,10 +2,8 @@ using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEditor.Callbacks;
+using Splashdown;
 
-
-namespace Splashdown
-{
 
     class PreBuildProcessor : IPreprocessBuildWithReport
     {
@@ -17,7 +15,7 @@ namespace Splashdown
         public void OnPreprocessBuild(BuildReport report)
         {
             if (Config.enabled)
-                SplashdownController.Run();
+                SplashdownController.Build();
         }
     }
 
@@ -30,4 +28,3 @@ namespace Splashdown
                 SplashdownController.Restore();
         }
     }
-}

@@ -6,7 +6,8 @@ using UnityEditor;
 using UnityEngine.TestTools;
 
 namespace Splashdown
-{ 
+{
+    
     public class SpriteGenerator
     {
         private static Texture2D texture;
@@ -79,11 +80,13 @@ namespace Splashdown
 
             //Reimport asset converting Default Texture2D to textureType "Sprite".
             TextureImporter importer = (TextureImporter)AssetImporter.GetAtPath(targetPath);
+            importer.userData = "Splashdown";
             importer.textureType = TextureImporterType.Sprite;
             importer.textureCompression = TextureImporterCompression.Uncompressed;
             EditorUtility.SetDirty(importer);
             importer.SaveAndReimport();
             
+            AssetDatabase.ImportAsset(targetPath);
             var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(targetPath);
             if(Config.logging && sprite == null) Debug.LogError($"Splashdown ::: could not load sprite at {targetPath}");
             return sprite;
@@ -97,7 +100,7 @@ namespace Splashdown
             if (text.Length > 10)
             {
                 text = text.Substring(0, 10);
-                Debug.LogWarning($"Splashdown ::: text is too long to fit, will be truncated: '{text}...'");
+                if(Config.logging) Debug.LogWarning($"Splashdown ::: text is too long to fit, will be truncated: '{text}...'");
             }
 
             //var font = Font.CreateDynamicFontFromOSFont("Courier New", FontSize); //todo: fallback to system font if custom one not found.

@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using UnityEngine;
 
 namespace Splashdown
@@ -25,8 +24,9 @@ namespace Splashdown
         public const int PostbuildCallbackOrder = 1;
 
         public static string filename = "generatedSprite.png";
+        
     }
-
+    
     public static class ConfigUtil
     {
         public static bool hasLine1 => !string.IsNullOrEmpty(Config.line1);

@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 0684375bb9be74cfbaa34eeeb77b1471
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: faaa72a4488af429da728176488d23af, type: 3}
+  includeInSplash: 1
+  includeInAppIcon: 0
+  enableLogging: 1
+  backgroundColor: {r: 0, g: 0, b: 0, a: 1}
+  textColor: {r: 1, g: 1, b: 0.6, a: 1}
+  line1: Hello
+  line2: world
+  line3: love
+  Sprite: {fileID: 1370841666128077191, guid: 0684375bb9be74cfbaa34eeeb77b1471, type: 3}

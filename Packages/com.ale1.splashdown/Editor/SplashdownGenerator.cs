@@ -1,18 +1,35 @@
 using System;
 using UnityEngine;
 using System.IO;
-using Codice.Client.BaseCommands.Merge.Xml;
 using UnityEditor;
-using UnityEngine.TestTools;
 
 namespace Splashdown
 {
     
-    public class SpriteGenerator
+    public class SplashdownGenerator
     {
         private static Texture2D texture;
 
-        public static Sprite Generate(string targetPath)
+        public static void GenerateSplashdownFile(string targetPath)
+        {
+            //Create empty placehodler Texture
+            texture = new Texture2D(360, 360, TextureFormat.RGBA32, false);
+            byte[] bytes = texture.EncodeToPNG();
+            string fullPath =  targetPath.Replace("Assets", Application.dataPath);
+            //create parent directory if doesnt exist
+            //Directory.CreateDirectory(Path.GetDirectoryName(fullPath) ?? throw new InvalidOperationException());
+            File.WriteAllBytes(fullPath, bytes);
+            AssetDatabase.Refresh();
+
+            //Reimport asset as Splasdhown
+            SplashdownImporter importer = (SplashdownImporter)AssetImporter.GetAtPath(targetPath);
+            EditorUtility.SetDirty(importer);
+            importer.SaveAndReimport();
+            AssetDatabase.ImportAsset(targetPath);
+        }
+        
+        
+        public static void CreateTexture(string targetPath)
         {
             // Create a new texture
             texture = new Texture2D(360, 360, TextureFormat.RGBA32, false);
@@ -31,7 +48,7 @@ namespace Splashdown
             // Calculate the spacing between lines based on how many lines are not empty
             // Set the buffer zone at the top and bottom
             float buffer = texture.height * 0.1f; // 10% of the texture's height
-            var nonEmptyLines = ConfigUtil.LineCount;
+            var nonEmptyLines = Config.LineCount;
 
             float lineHeight = (texture.height - buffer) / (float)nonEmptyLines;
 
@@ -39,7 +56,7 @@ namespace Splashdown
             int currentLine = 0;
 
             // Add non-empty text lines to the texture
-            if (ConfigUtil.hasLine1)
+            if (Config.hasLine1)
             {
                 AddText(texture, Config.line1,
                     Mathf.FloorToInt(buffer + lineHeight * (nonEmptyLines - 1 - currentLine)));
@@ -47,7 +64,7 @@ namespace Splashdown
                 currentLine++;
             }
 
-            if (ConfigUtil.hasLine2)
+            if (Config.hasLine2)
             {
                 AddText(texture, Config.line2,
                     Mathf.FloorToInt(buffer + lineHeight * (nonEmptyLines - 1 - currentLine)));
@@ -55,7 +72,7 @@ namespace Splashdown
                 currentLine++;
             }
 
-            if (ConfigUtil.hasLine3)
+            if (Config.hasLine3)
             {
                 AddText(texture, Config.line3,
                     Mathf.FloorToInt(buffer + lineHeight * (nonEmptyLines - 1 - currentLine)));
@@ -66,30 +83,15 @@ namespace Splashdown
 
             // Save texture to PNG
             byte[] bytes = texture.EncodeToPNG();
-
-            string fullpath =  targetPath.Replace("Assets", Application.dataPath);
-            Debug.Log(fullpath);
+            string fullPath =  targetPath.Replace("Assets", Application.dataPath);
 
             //create parent directory if doesnt exist
-            Directory.CreateDirectory(Path.GetDirectoryName(fullpath) ?? throw new InvalidOperationException());
+            //Directory.CreateDirectory(Path.GetDirectoryName(fullPath) ?? throw new InvalidOperationException());
             
-            File.WriteAllBytes(fullpath, bytes);
+            File.WriteAllBytes(fullPath, bytes);
 
-            if (Config.logging) Debug.Log("Texture saved at: " + fullpath);
+            if (Config.logging) Debug.Log("Texture saved at: " + fullPath);
             AssetDatabase.Refresh();
-
-            //Reimport asset converting Default Texture2D to textureType "Sprite".
-            TextureImporter importer = (TextureImporter)AssetImporter.GetAtPath(targetPath);
-            importer.userData = "Splashdown";
-            importer.textureType = TextureImporterType.Sprite;
-            importer.textureCompression = TextureImporterCompression.Uncompressed;
-            EditorUtility.SetDirty(importer);
-            importer.SaveAndReimport();
-            
-            AssetDatabase.ImportAsset(targetPath);
-            var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(targetPath);
-            if(Config.logging && sprite == null) Debug.LogError($"Splashdown ::: could not load sprite at {targetPath}");
-            return sprite;
         }
 
 

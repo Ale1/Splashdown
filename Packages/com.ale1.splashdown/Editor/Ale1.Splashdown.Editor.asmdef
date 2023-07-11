@@ -1,9 +1,7 @@
 {
     "name": "Ale1.Splashdown.Editor",
     "rootNamespace": "Ale1.Splashdown",
-    "references": [
-        "GUID:537187fde0ed244a09fe31aeaa00e4b8"
-    ],
+    "references": [],
     "includePlatforms": [
         "Editor"
     ],

@@ -1,4 +1,5 @@
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,15 +19,16 @@ namespace Splashdown
 
         private static bool restoreSplash;
         private static bool restoreIcons;
-
-
-        [MenuItem("Assets/Create/Splashdown/Icon")]
-        public static void GenerateIcon()
+        
+        const string defaultFilename = "MySplashdown.splashdown"; //todo: move to constants
+        
+        [MenuItem("Assets/Create/New Splashdown")]
+        public static void CreateSplashdown()
         {
-            GenerateIcon(AssetDatabase.GetAssetPath(Selection.activeObject));
+            CreateSplashdown(AssetDatabase.GetAssetPath(Selection.activeObject));
         }
         
-        private static void GenerateIcon(string targetPath)
+        private static void CreateSplashdown(string targetPath)
         {
             if (string.IsNullOrEmpty(targetPath))
             {
@@ -34,55 +36,52 @@ namespace Splashdown
             }
             else if (Directory.Exists(targetPath)) // its a directory.
             {
-                targetPath = Path.Combine(targetPath, Config.filename);
+                targetPath = Path.Combine(targetPath, defaultFilename);
             }
-            else if (Path.GetExtension(targetPath) == ".png")
+            else if (Path.GetExtension(targetPath) == ".splashdown")
             {
                 // keep path as it is, to replace file.
             }
             else if (Path.GetExtension(targetPath) != "") //path is pointing to a non-png file.  Use same location but use default filename.
             {
                 targetPath = targetPath.Replace(Path.GetFileName(AssetDatabase.GetAssetPath(Selection.activeObject)), "");
-                targetPath = Path.Combine(targetPath, Config.filename);
+                targetPath = Path.Combine(targetPath, defaultFilename);
             }
+
+            SplashdownGenerator.GenerateSplashdownFile(targetPath);
             
-            Debug.Log(targetPath);
-            
-            var sprite = SpriteGenerator.Generate(targetPath);
-  
-            if (sprite != null)
-            {
-                var guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(sprite));
-                EditorPrefs.SetString("Splashdown/logoGUID",guid);
-                EditorPrefs.SetString("Splashdown/iconGUID", guid);
-            }
         }
 
+        [MenuItem("Splashdown/Test")]
         public static void Build()
         {
-            if (Config.replaceSplash)
-            { 
-                //reuse old path if possible to override generatedSprite.
-                var lastSprite = GetGUIDFromPrefs("Splashdown/logoGUID");
-                var oldPath = AssetDatabase.GUIDToAssetPath(lastSprite);
-                GenerateIcon(oldPath);
-                var sprite = FetchSpriteFromPrefs("Splashdown/logoGUID");
-                var shouldRestore = SetSplash(sprite);
-                restoreSplash = shouldRestore;
+            var splashdown = Config.MySplashdown;
+            if (splashdown == null)
+            {
+                Debug.LogError("something went wrong");
+                return;
+            }
+            
+            Debug.Log("hello" + AssetDatabase.GetAssetPath(splashdown.Sprite));
+
+            if (splashdown.Sprite == null)
+            {
+                Debug.LogError("splashdown.Sprite is null");
+                return;
+            }
+            
+            if (Config.includeSplash)
+            {
+                restoreSplash = SetSplash(splashdown.Sprite);
             }
             
             if (Config.replaceIcon)
             {
-                var sprite = FetchSpriteFromPrefs("Splashdown/iconGUID");
-                if (sprite == null)
-                {
-                    GenerateIcon("Assets");
-                    sprite = FetchSpriteFromPrefs("Splashdown/iconGUID");
-                }
-                var shouldRestore = SetIcons(sprite);
-                restoreIcons = shouldRestore;
+                restoreIcons = SetIcons(splashdown.Sprite);
+               
             }
         }
+
 
 
         public static void Restore()
@@ -135,7 +134,7 @@ namespace Splashdown
 
         private static bool SetIcons(Sprite sprite)
         {
-            var transparentBackground = AssetDatabase.LoadAssetAtPath<Texture2D>("Packages/com.coldtower.splashdown/Editor/splashdown_transparent.png");
+            var transparentBackground = AssetDatabase.LoadAssetAtPath<Texture2D>("Packages/com.ale1.splashdown/Editor/splashdown_transparent.png");  //todo: move to constants
 
             if (sprite == null || transparentBackground == null)
             {
@@ -158,8 +157,7 @@ namespace Splashdown
                 var icons = PlayerSettings.GetPlatformIcons(platform, kind);
                 _backupIcons[kind] = icons;
             }
-            
-            
+
             foreach (var kind in kinds)
             {
                 var icons = PlayerSettings.GetPlatformIcons(platform, kind);
@@ -176,13 +174,12 @@ namespace Splashdown
 
                 PlayerSettings.SetPlatformIcons(platform, kind, icons);
             }
-
             return true;
         }
 
         private static void RestoreSplash()
         {
-            if(Config.replaceSplash)
+            if(Config.includeSplash)
                 PlayerSettings.SplashScreen.logos = _backupLogos;
         }
 
@@ -250,17 +247,6 @@ namespace Splashdown
             T[] newArray = new T[originalArray.Length + 1];
             newArray[0] = newItem;
             Array.Copy(originalArray, 0, newArray, 1, originalArray.Length);
-            return newArray;
-        }
-
-        /// <summary>
-        /// Remove the first item from the array
-        /// </summary>
-        /// <returns> returns a copy with (length - 1) </returns>
-        private static T[] RemoveFirst<T>(this T[] originalArray)
-        {
-            T[] newArray = new T[originalArray.Length - 1];
-            Array.Copy(originalArray, 1, newArray, 0, originalArray.Length - 1);
             return newArray;
         }
     }

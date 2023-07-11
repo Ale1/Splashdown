@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.ale1.splashdown": {
-      "version": "file:com.coldtower.splashdown",
+      "version": "file:com.ale1.splashdown",
       "depth": 0,
       "source": "embedded",
       "dependencies": {}

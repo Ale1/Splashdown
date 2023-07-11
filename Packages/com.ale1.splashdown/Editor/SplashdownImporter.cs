@@ -1,45 +1,47 @@
 
+using Codice.Client.BaseCommands;
+using Splashdown.Editor;
+using UnityEditor;
 using UnityEngine;
 using UnityEditor.AssetImporters;
-using UnityEditor;
 
-namespace Splashdown
+namespace Splashdown.Editor
 {
     [ScriptedImporter(1, "splashdown")]
     public class SplashdownImporter : ScriptedImporter
     {
-        public bool includeInSplash;
-        public bool includeInAppIcon;
-        public bool enableLogging;
-
-        public Color backgroundColor = Color.black;
-        public Color textColor = new (1f, 1f, 0.6f, 1f);
-        
-        public string line1;
-        public string line2;
-        public string line3;
 
         public Sprite Sprite;
-        
+        public SplashdownOptions Options;
+
+        private string assetPath;
         
         public override void OnImportAsset(AssetImportContext ctx)
         {
-            SplashdownGenerator.CreateTexture(ctx.assetPath);
+            Debug.Log("banana");
 
-            if (includeInSplash)
+            if (Options == null)
+                Options = new SplashdownOptions();
+            
+            SplashdownGenerator.CreateTexture(ctx.assetPath, Options);
+            
+            //cache asset path for later use
+            assetPath = ctx.assetPath;
+            
+            if (Options.useAsSplash)
             {
                 //todo: add or remove logo to splash
             }
 
-            if (includeInAppIcon)
+            if (Options.useAsAppIcon)
             {
                 //todo: add or remove sprite to icons
             }
 
-                // Load the file as bytes
+            // Load the file as bytes
             var fileData = System.IO.File.ReadAllBytes(ctx.assetPath);
 
-            //convert the bytes to texture.
+            // Convert the bytes to texture.
             var texture = new Texture2D(320, 320);
             texture.LoadImage(fileData);
 
@@ -47,14 +49,19 @@ namespace Splashdown
             var sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
             sprite.name = "Generated";
 
-            // Use the AssetImportContext to add objects to the imported asset
+            // Add objects to the imported asset
             ctx.AddObjectToAsset("main tex", texture);
             ctx.AddObjectToAsset("main sprite", sprite);
             ctx.SetMainObject(texture);
-            
-            //save the sprite for easy retrieval later
+
+            // Save the sprite and Config for easy retrieval later
             Sprite = sprite;
+            
+            AssetDatabase.Refresh();
+
         }
         
+        
+       
     }
 }

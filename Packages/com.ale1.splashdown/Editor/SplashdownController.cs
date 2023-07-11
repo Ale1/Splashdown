@@ -1,7 +1,5 @@
 using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Android;
@@ -9,8 +7,7 @@ using UnityEditor.Build;
 using UnityEditor.iOS;
 using UnityEngine;
 
-
-namespace Splashdown
+namespace Splashdown.Editor
 {
     public static class SplashdownController
     {
@@ -19,70 +16,60 @@ namespace Splashdown
 
         private static bool restoreSplash;
         private static bool restoreIcons;
-        
-        const string defaultFilename = "MySplashdown.splashdown"; //todo: move to constants
-        
-        [MenuItem("Assets/Create/New Splashdown")]
-        public static void CreateSplashdown()
-        {
-            CreateSplashdown(AssetDatabase.GetAssetPath(Selection.activeObject));
-        }
-        
-        private static void CreateSplashdown(string targetPath)
-        {
-            if (string.IsNullOrEmpty(targetPath))
-            {
-                targetPath = "Assets";
-            }
-            else if (Directory.Exists(targetPath)) // its a directory.
-            {
-                targetPath = Path.Combine(targetPath, defaultFilename);
-            }
-            else if (Path.GetExtension(targetPath) == ".splashdown")
-            {
-                // keep path as it is, to replace file.
-            }
-            else if (Path.GetExtension(targetPath) != "") //path is pointing to a non-png file.  Use same location but use default filename.
-            {
-                targetPath = targetPath.Replace(Path.GetFileName(AssetDatabase.GetAssetPath(Selection.activeObject)), "");
-                targetPath = Path.Combine(targetPath, defaultFilename);
-            }
 
-            SplashdownGenerator.GenerateSplashdownFile(targetPath);
-            
+        private static SplashdownOptions config => MySplashdown.Options;
+        private static Sprite sprite => MySplashdown.Sprite;
+
+  
+        private static SplashdownImporter _mySplashdown; //backing field.
+        public static SplashdownImporter MySplashdown
+        {
+                get
+                {
+                    if (_mySplashdown != null)
+                        return _mySplashdown;
+                
+                    string[] guids = AssetDatabase.FindAssets("");
+                    foreach (string guid in guids)
+                    {
+                        string path = AssetDatabase.GUIDToAssetPath(guid);
+                        if(System.IO.Path.GetExtension(path) == ".splashdown")
+                        {
+                            _mySplashdown = (SplashdownImporter)AssetImporter.GetAtPath(path);
+                        }
+                    }
+                    if(_mySplashdown == null)
+                        Debug.LogError("no splashdown found");
+                    return _mySplashdown;
+                }
         }
 
-        [MenuItem("Splashdown/Test")]
-        public static void Build()
+        public static void Build(Sprite sprite, float splashTime)
         {
-            var splashdown = Config.MySplashdown;
-            if (splashdown == null)
+            if (config == null)
             {
                 Debug.LogError("something went wrong");
                 return;
             }
-            
-            Debug.Log("hello" + AssetDatabase.GetAssetPath(splashdown.Sprite));
 
-            if (splashdown.Sprite == null)
+            if (sprite == null)
             {
                 Debug.LogError("splashdown.Sprite is null");
                 return;
             }
             
-            if (Config.includeSplash)
+            if (config.useAsSplash)
             {
-                restoreSplash = SetSplash(splashdown.Sprite);
+                restoreSplash = SetSplash(sprite, splashTime);
             }
             
-            if (Config.replaceIcon)
+            if (config.useAsAppIcon)
             {
-                restoreIcons = SetIcons(splashdown.Sprite);
+                restoreIcons = SetIcons(sprite);
                
             }
         }
-
-
+        
 
         public static void Restore()
         {
@@ -90,38 +77,19 @@ namespace Splashdown
             if(restoreIcons) RestoreIcons();
             AssetDatabase.SaveAssets();
         }
+        
 
-        private static Sprite FetchSpriteFromPrefs(string key)
-        {
-            var spriteGUID = GetGUIDFromPrefs(key);
-            if (spriteGUID != "")
-            {
-                var path = AssetDatabase.GUIDToAssetPath(spriteGUID);
-                if (path != "")
-                {
-                    var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
-                    return sprite;   
-                }
-            }
-            return null;
-        }
-
-        private static string GetGUIDFromPrefs(string key)
-        {
-            return EditorPrefs.GetString(key, "");
-        }
-
-        private static bool SetSplash(Sprite sprite)
+        private static bool SetSplash(Sprite sprite, float splashTime)
         {
             PlayerSettings.SplashScreenLogo[] backupLogos = PlayerSettings.SplashScreen.logos;
             
             if (sprite == null)
             {
-                if(Config.logging) Debug.LogError("could not find splash logo");
+                Debug.LogError("could not find splash logo");
                 return false;
             }
             
-            var splashdownLogo = PlayerSettings.SplashScreenLogo.Create(Config.splashTime, sprite);
+            var splashdownLogo = PlayerSettings.SplashScreenLogo.Create(splashTime, sprite);
 
             if (!backupLogos.Contains(splashdownLogo))
             {
@@ -138,10 +106,9 @@ namespace Splashdown
 
             if (sprite == null || transparentBackground == null)
             {
-                if(Config.logging) Debug.LogError("error loading sprites");
+                Debug.LogError("error loading sprites");
                 return false;
             }
-            
 
             NamedBuildTarget platform;
             PlatformIconKind[] kinds;
@@ -179,20 +146,16 @@ namespace Splashdown
 
         private static void RestoreSplash()
         {
-            if(Config.includeSplash)
-                PlayerSettings.SplashScreen.logos = _backupLogos;
+            PlayerSettings.SplashScreen.logos = _backupLogos;
         }
 
         private static void RestoreIcons()
         {
-            if (Config.replaceIcon)
+            if (FetchPlatform(out NamedBuildTarget platform))
             {
-                if (FetchPlatform(out NamedBuildTarget platform))
+                foreach (var entry in _backupIcons)
                 {
-                    foreach (var entry in _backupIcons)
-                    {
-                        PlayerSettings.SetPlatformIcons(platform, entry.Key, entry.Value);
-                    }
+                    PlayerSettings.SetPlatformIcons(platform, entry.Key, entry.Value);
                 }
             }
         }
@@ -213,7 +176,7 @@ namespace Splashdown
                     kinds = new[] { iOSPlatformIconKind.Application };
                     return true;
                 default:
-                    if(Config.logging) Debug.LogError("unsupported platform");
+                    Debug.LogError("unsupported platform");
                     kinds = null;
                     return false;
             }
@@ -232,7 +195,7 @@ namespace Splashdown
                     return true;
                 default:
                     platform = NamedBuildTarget.Unknown;
-                    if(Config.logging) Debug.LogWarning("unsupported build target");
+                    Debug.LogWarning("unsupported build target");
                     return false;
             }
         }

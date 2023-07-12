@@ -1,54 +1,77 @@
-using System;
 using UnityEngine;
 using System.IO;
 using UnityEditor;
 
-namespace Splashdown
+namespace Splashdown.Editor
 {
-    
-    public class SplashdownGenerator
+    public static class SplashdownGenerator
     {
-        private static Texture2D texture;
-
-        public static void GenerateSplashdownFile(string targetPath)
+        
+        const string defaultFilename = "MySplashdown.splashdown"; 
+        
+        [MenuItem("Assets/Create/New Splashdown")]
+        public static void CreateNewSplashdownFromContextMenu()
         {
-            //Create empty placehodler Texture
-            texture = new Texture2D(360, 360, TextureFormat.RGBA32, false);
+            var targetPath = (AssetDatabase.GetAssetPath(Selection.activeObject));
+            
+            if (string.IsNullOrEmpty(targetPath))
+            {
+                targetPath = "Assets";
+            }
+            else if (Directory.Exists(targetPath)) // its a directory.
+            {
+                targetPath = Path.Combine(targetPath, defaultFilename);
+            }
+            else if (Path.GetExtension(targetPath) != "") //path is pointing to a file.  Use same location but use default filename.
+            {
+                targetPath = targetPath.Replace(Path.GetFileName(AssetDatabase.GetAssetPath(Selection.activeObject)), "");
+                targetPath = Path.Combine(targetPath, defaultFilename);
+            }
+
+            var options = new Splashdown.Options();
+            GenerateSplashdownFile(targetPath, options);
+        }
+        
+        
+        public static void GenerateSplashdownFile(string targetPath, Splashdown.Options options)
+        {
+            // Apply the customizations here
+            var texture = CreateTexture(targetPath, options);
+            
             byte[] bytes = texture.EncodeToPNG();
             string fullPath =  targetPath.Replace("Assets", Application.dataPath);
-            //create parent directory if doesnt exist
-            //Directory.CreateDirectory(Path.GetDirectoryName(fullPath) ?? throw new InvalidOperationException());
             File.WriteAllBytes(fullPath, bytes);
             AssetDatabase.Refresh();
 
-            //Reimport asset as Splasdhown
+            // Reimport asset as Splashdown
             SplashdownImporter importer = (SplashdownImporter)AssetImporter.GetAtPath(targetPath);
             EditorUtility.SetDirty(importer);
             importer.SaveAndReimport();
             AssetDatabase.ImportAsset(targetPath);
         }
         
-        
-        public static void CreateTexture(string targetPath)
+        public static Texture2D CreateTexture(string targetPath, Splashdown.Options options)
         {
             // Create a new texture
-            texture = new Texture2D(360, 360, TextureFormat.RGBA32, false);
+            var texture = new Texture2D(360, 360, TextureFormat.RGBA32, false);
 
-            // Fill the texture with the background color
+            if (options == null)
+                options = new Splashdown.Options(); 
+            
+            // Fill the texture with the background color 
             Color[] pixels = new Color[texture.width * texture.height];
             for (int i = 0; i < pixels.Length; i++)
             {
-                pixels[i] = Config.backgroundColor;
+                pixels[i] = options.backgroundColor;
             }
 
             texture.SetPixels(pixels);
             texture.Apply();
-
-
+            
             // Calculate the spacing between lines based on how many lines are not empty
             // Set the buffer zone at the top and bottom
             float buffer = texture.height * 0.1f; // 10% of the texture's height
-            var nonEmptyLines = Config.LineCount;
+            var nonEmptyLines = options.LineCount;
 
             float lineHeight = (texture.height - buffer) / (float)nonEmptyLines;
 
@@ -56,30 +79,27 @@ namespace Splashdown
             int currentLine = 0;
 
             // Add non-empty text lines to the texture
-            if (Config.hasLine1)
+            if (options.hasLine1)
             {
-                AddText(texture, Config.line1,
-                    Mathf.FloorToInt(buffer + lineHeight * (nonEmptyLines - 1 - currentLine)));
+                texture.AddText(options.line1, Mathf.FloorToInt(buffer + lineHeight * (nonEmptyLines - 1 - currentLine)), options);
                 texture.Apply();
                 currentLine++;
             }
 
-            if (Config.hasLine2)
+            if (options.hasLine2)
             {
-                AddText(texture, Config.line2,
-                    Mathf.FloorToInt(buffer + lineHeight * (nonEmptyLines - 1 - currentLine)));
+                texture.AddText(options.line2, Mathf.FloorToInt(buffer + lineHeight * (nonEmptyLines - 1 - currentLine)), options);
                 texture.Apply();
                 currentLine++;
             }
 
-            if (Config.hasLine3)
+            if (options.hasLine3)
             {
-                AddText(texture, Config.line3,
-                    Mathf.FloorToInt(buffer + lineHeight * (nonEmptyLines - 1 - currentLine)));
+                texture.AddText(options.line3, Mathf.FloorToInt(buffer + lineHeight * (nonEmptyLines - 1 - currentLine)), options);
                 texture.Apply();
             }
 
-            AddBorder(Color.white);
+            texture.AddBorder(Color.white);
 
             // Save texture to PNG
             byte[] bytes = texture.EncodeToPNG();
@@ -90,42 +110,45 @@ namespace Splashdown
             
             File.WriteAllBytes(fullPath, bytes);
 
-            if (Config.logging) Debug.Log("Texture saved at: " + fullPath);
-            AssetDatabase.Refresh();
+            if (options.logging) Debug.Log("Texture saved at: " + fullPath);
+
+            return texture;
         }
 
 
-        private static void AddText(Texture2D texture, string text, int yPosition)
+        private static void AddText(this Texture2D texture, string text, int yPosition, Splashdown.Options options)
         {
             //todo: use max text width instead of number of characters to decide if truncation is necessary. 
             //remarks: right now since current font is monospaced, text character count is good measure of width, but to support other fonts will need to add individual characer widths.
             if (text.Length > 10)
             {
                 text = text.Substring(0, 10);
-                if(Config.logging) Debug.LogWarning($"Splashdown ::: text is too long to fit, will be truncated: '{text}...'");
+                Debug.LogWarning($"Splashdown ::: text is too long to fit, will be truncated: '{text}...'");
             }
 
             //var font = Font.CreateDynamicFontFromOSFont("Courier New", FontSize); //todo: fallback to system font if custom one not found.
-            Font font = AssetDatabase.LoadAssetAtPath<Font>("Packages/com.Ale1.splashdown/Editor/Splashdown_RobotoMono.ttf");
-            if (font == null)
+            if (options.font == null)
+            {
                 Debug.Log("no font found");
+            }
 
-            var FontSize = font.fontSize;
+            var font = options.font;
+            var fontSize = font.fontSize;
 
             // Start text with 5% margin from the left
             int startPosition = Mathf.FloorToInt(texture.width * 0.05f);
 
             // Let's make the texture's height equal to the font's size plus some extra 
-            RenderTexture rt = RenderTexture.GetTemporary(texture.width, (int)(FontSize * 1.1f));
+            RenderTexture rt = RenderTexture.GetTemporary(texture.width, (int)(fontSize * 1.1f));
             RenderTexture.active = rt;
 
             // Clear the RenderTexture to desired color
-            GL.Clear(true, true, Config.backgroundColor);
+            GL.Clear(true, true, options.backgroundColor);
 
             Material fontMaterial = new Material(Shader.Find("GUI/Text Shader"));
 
             // Set the text color
-            fontMaterial.SetColor("_Color", Config.textColor);
+            fontMaterial.SetColor("_Color", options.textColor);
 
             fontMaterial.mainTexture = font.material.mainTexture;
 
@@ -135,14 +158,13 @@ namespace Splashdown
             fontMaterial.SetPass(0);
 
             GL.Begin(GL.QUADS);
-            font.RequestCharactersInTexture(text, FontSize);
-
-            //Vector3 position = new Vector3(startPosition, font.ascent, 0);
-            Vector3 position = new Vector3(startPosition, font.ascent - FontSize * 0.26f, 0);
+            font.RequestCharactersInTexture(text, fontSize);
+            
+            Vector3 position = new Vector3(startPosition, font.ascent - fontSize * 0.26f, 0);
 
             for (int i = 0; i < text.Length; i++)
             {
-                if (font.GetCharacterInfo(text[i], out CharacterInfo ch, FontSize))
+                if (font.GetCharacterInfo(text[i], out CharacterInfo ch, fontSize))
                 {
                     // Adjust x position for next character
                     position.x += ch.advance;
@@ -191,7 +213,7 @@ namespace Splashdown
             return totalWidth;
         }
 
-        private static void AddBorder(Color color)
+        private static void AddBorder(this Texture2D texture, Color color)
         {
             // Define border thickness
             int borderThickness = 13;

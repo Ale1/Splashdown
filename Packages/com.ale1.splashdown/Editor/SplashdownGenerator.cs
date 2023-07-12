@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.IO;
-using Codice.Client.BaseCommands;
 using UnityEditor;
 
 namespace Splashdown.Editor
@@ -29,12 +28,12 @@ namespace Splashdown.Editor
                 targetPath = Path.Combine(targetPath, defaultFilename);
             }
 
-            var options = new SplashdownOptions();
+            var options = new Splashdown.Options();
             GenerateSplashdownFile(targetPath, options);
         }
         
         
-        public static void GenerateSplashdownFile(string targetPath, SplashdownOptions options)
+        public static void GenerateSplashdownFile(string targetPath, Splashdown.Options options)
         {
             // Apply the customizations here
             var texture = CreateTexture(targetPath, options);
@@ -51,13 +50,13 @@ namespace Splashdown.Editor
             AssetDatabase.ImportAsset(targetPath);
         }
         
-        public static Texture2D CreateTexture(string targetPath, SplashdownOptions options)
+        public static Texture2D CreateTexture(string targetPath, Splashdown.Options options)
         {
             // Create a new texture
             var texture = new Texture2D(360, 360, TextureFormat.RGBA32, false);
 
             if (options == null)
-                options = new SplashdownOptions(); 
+                options = new Splashdown.Options(); 
             
             // Fill the texture with the background color 
             Color[] pixels = new Color[texture.width * texture.height];
@@ -113,13 +112,12 @@ namespace Splashdown.Editor
             File.WriteAllBytes(fullPath, bytes);
 
             if (options.logging) Debug.Log("Texture saved at: " + fullPath);
-            AssetDatabase.Refresh();
 
             return texture;
         }
 
 
-        private static void AddText(this Texture2D texture, string text, int yPosition, SplashdownOptions options)
+        private static void AddText(this Texture2D texture, string text, int yPosition, Splashdown.Options options)
         {
             //todo: use max text width instead of number of characters to decide if truncation is necessary. 
             //remarks: right now since current font is monospaced, text character count is good measure of width, but to support other fonts will need to add individual characer widths.

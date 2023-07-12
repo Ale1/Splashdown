@@ -17,7 +17,7 @@ namespace Splashdown.Editor
         private static bool restoreSplash;
         private static bool restoreIcons;
 
-        private static SplashdownOptions config => MySplashdown.Options;
+        private static Splashdown.Options config => MySplashdown.Options;
         private static Sprite sprite => MySplashdown.Sprite;
 
   

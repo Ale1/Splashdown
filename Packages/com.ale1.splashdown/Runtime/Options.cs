@@ -2,10 +2,10 @@ using System;
 
 using UnityEngine;
 
-namespace Splashdown.Editor
+namespace Splashdown
 {
     [Serializable]
-    public class SplashdownOptions
+    public class Options
     {
         public bool useAsSplash;
         public bool useAsAppIcon;

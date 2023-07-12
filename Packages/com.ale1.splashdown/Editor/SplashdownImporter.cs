@@ -12,8 +12,11 @@ namespace Splashdown.Editor
     {
         public bool useDynamicOptions;
 
+
+        [HideInInspector] public Font Font;
         [HideInInspector] public Sprite Sprite;
         public Splashdown.Options Options;
+        
 
         public override void OnImportAsset(AssetImportContext ctx)
         {
@@ -23,13 +26,24 @@ namespace Splashdown.Editor
 
         private void ImportWithContext(AssetImportContext ctx)
         {
-            Debug.Log("banana");
-            
             if(useDynamicOptions)
                 Options = FetchDynamicOptions();
             
             if (Options == null)
                 Options = new Splashdown.Options();
+            
+            if (Font == null && Options.font == null)
+            {
+                Options.font = AssetDatabase.LoadAssetAtPath<Font>("Packages/com.Ale1.splashdown/Editor/Splashdown_RobotoMono.ttf");
+                Font = Options.font;
+            }
+            else
+            {
+                Font = Options.font;
+            }
+            
+            if(Font == null) Debug.LogError("no font found");
+            ctx.AddObjectToAsset("font",Font);
             
             SplashdownGenerator.CreateTexture(ctx.assetPath, Options);
 

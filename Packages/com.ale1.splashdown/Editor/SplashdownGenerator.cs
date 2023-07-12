@@ -67,8 +67,7 @@ namespace Splashdown.Editor
 
             texture.SetPixels(pixels);
             texture.Apply();
-
-
+            
             // Calculate the spacing between lines based on how many lines are not empty
             // Set the buffer zone at the top and bottom
             float buffer = texture.height * 0.1f; // 10% of the texture's height
@@ -89,14 +88,14 @@ namespace Splashdown.Editor
 
             if (options.hasLine2)
             {
-                texture.AddText(options.line2, Mathf.FloorToInt(buffer + lineHeight * (nonEmptyLines - 1 - currentLine)),options);
+                texture.AddText(options.line2, Mathf.FloorToInt(buffer + lineHeight * (nonEmptyLines - 1 - currentLine)), options);
                 texture.Apply();
                 currentLine++;
             }
 
             if (options.hasLine3)
             {
-                texture.AddText(options.line3, Mathf.FloorToInt(buffer + lineHeight * (nonEmptyLines - 1 - currentLine)),options);
+                texture.AddText(options.line3, Mathf.FloorToInt(buffer + lineHeight * (nonEmptyLines - 1 - currentLine)), options);
                 texture.Apply();
             }
 
@@ -128,16 +127,19 @@ namespace Splashdown.Editor
             }
 
             //var font = Font.CreateDynamicFontFromOSFont("Courier New", FontSize); //todo: fallback to system font if custom one not found.
-            Font font = AssetDatabase.LoadAssetAtPath<Font>("Packages/com.Ale1.splashdown/Editor/Splashdown_RobotoMono.ttf");
-            if (font == null) Debug.Log("no font found");
+            if (options.font == null)
+            {
+                Debug.Log("no font found");
+            }
 
-            var FontSize = font.fontSize;
+            var font = options.font;
+            var fontSize = font.fontSize;
 
             // Start text with 5% margin from the left
             int startPosition = Mathf.FloorToInt(texture.width * 0.05f);
 
             // Let's make the texture's height equal to the font's size plus some extra 
-            RenderTexture rt = RenderTexture.GetTemporary(texture.width, (int)(FontSize * 1.1f));
+            RenderTexture rt = RenderTexture.GetTemporary(texture.width, (int)(fontSize * 1.1f));
             RenderTexture.active = rt;
 
             // Clear the RenderTexture to desired color
@@ -156,13 +158,13 @@ namespace Splashdown.Editor
             fontMaterial.SetPass(0);
 
             GL.Begin(GL.QUADS);
-            font.RequestCharactersInTexture(text, FontSize);
+            font.RequestCharactersInTexture(text, fontSize);
             
-            Vector3 position = new Vector3(startPosition, font.ascent - FontSize * 0.26f, 0);
+            Vector3 position = new Vector3(startPosition, font.ascent - fontSize * 0.26f, 0);
 
             for (int i = 0; i < text.Length; i++)
             {
-                if (font.GetCharacterInfo(text[i], out CharacterInfo ch, FontSize))
+                if (font.GetCharacterInfo(text[i], out CharacterInfo ch, fontSize))
                 {
                     // Adjust x position for next character
                     position.x += ch.advance;

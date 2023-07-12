@@ -1,11 +1,8 @@
-```diff 
----------------------------------------------------------------------------------
-```
-# NOTICE
+
+# 🟥 NOTICE 🟥
 This is WIP and version 1.0.0 will be released soon on OpenNPM! (Exepcted July 25 - 2023)
-```diff 
----------------------------------------------------------------------------------
-```
+
+〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️
 
 # Splashdown
 A Unity open-source splash and icon tool that will generate custom icons with user-provided text.  Allows for dynamic scripted content and to be incorporated into your build pipeline. 
@@ -81,6 +78,15 @@ WIP : how to force splashdown to refresh via script.
 # Step 3: Add Splashdown to your build pipeline
 WIP
 
+
+# Supported Unity Versions
+
+| Version  | Supported         |
+| -------- | ----------------- |
+| < 2021.X | ✖️ not supported  |
+| 2021.X   | ✅ supported      |
+| 2022.X   | ❔ untested       |
+| 2023.X   | ❔ untested       |
 
 # FAQ
 wip

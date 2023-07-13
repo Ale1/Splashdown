@@ -7,8 +7,9 @@ This is WIP and version 1.0.0 will be released soon on OpenNPM! (Exepcted July 2
 # Splashdown
 A Unity open-source splash and icon tool that will generate custom icons with user-provided text.  Allows for dynamic scripted content and to be incorporated into your build pipeline. 
 
-Its purpose is to aid in quick iteration of unity mobile games, and allow no-code team members such as external Q.A testers, designers and general playtesters to quickly identify the app they are testing on their mobile device.  
-A quick glimpse at the generated icons and logos can give build information without the need for opening the app or creating custom unity splashes. 
+Its purpose is to aid in quick iteration of unity mobile games, and allow no-code team members such as Q.A testers, designers and general playtesters to quickly identify the build variant that is installed on their mobile device.  
+A quick glimpse at the generated icons and logos can give build release information without the need for opening the app or creating custom unity splashes.  
+The customizable text can be used to show things like date, author, build version, unity version, short release notes, beta tags, disclaimers, copyright notices, etc. 
 
 
 | ![splashdown1](https://github.com/Ale1/Splashdown/assets/4612160/292d322b-bc9f-4154-a9ba-581f51c466ca) | ![IMG_B492065383A8-1](https://github.com/Ale1/Splashdown/assets/4612160/9f02fcfd-6790-4f02-abb6-71b9c405ff01) |
@@ -22,9 +23,9 @@ wip
 
 
 # Getting Started 
-## Hello World
-Right-click on the Assets Folder.  Select `Create > New Splashdown`.   
-A Splashdown file will appear.  Feel free to move the file to a subfolder (as long as its a child of Assets folder). 
+## (1) Hello World
+Right-click on any location within the Assets Folder.  Select `Create > New Splashdown`.   
+A Splashdown file will appear. 
 
 Fill in the Splashdown Importer window and hit `Apply`.  
 
@@ -32,9 +33,8 @@ Fill in the Splashdown Importer window and hit `Apply`.
 
 Congrats! you generated your first custom Icon
 
-The child sub-asset of this file is Sprie you can now can use as a placeholder App icon, or as a logo in your Splash screen. 
+This file can be used as a placeholder app icon or logo in your Build Settings.
 If you are happy to just set the app icon or splash manually then you are all set!   
-
 
 
 | ![Screenshot 2023-07-12 at 22 10 42](https://github.com/Ale1/Splashdown/assets/4612160/1ec61486-ab92-432a-b274-e037de82f433) |
@@ -46,8 +46,9 @@ If you are happy to just set the app icon or splash manually then you are all se
 <b>If you wish to automatate the contents of the icon, proceed... </b>
 <br/><br/>
 
-## Dynamic Options
+## (2) Dynamic Options
 
+The Dynamic Options feature will allow you to quickly update the splashdown file without manually typing in info. Its particularly useful for allowing splashdown to keep track of Dates or build versions. 
 Create a script like below and place it anywhere in your project. Though its recommended that you place it in an `Editor` folder. 
 The splashdown importer will automatically invoke methods with the `[Splashdown.OptionsProvider]` attribute whenever its refreshed. 
 Dynamically created Options will override any manual inputs in hte splashdown importer.
@@ -75,8 +76,19 @@ WIP : how to force splashdown to refresh via script.
 <b>If you wish to automatically include the splashdown icon on every build, proceed....</b>
 <br/><br/>
 
-# Step 3: Add Splashdown to your build pipeline
-WIP
+## (3) Add Splashdown to your build pipeline
++ WIP
+
+
+# Advanced Customization
+## Switching Fonts
++ WIP
+
+## Customizing the Border
++ WIP
+
+## using a texture as background or watermark
++ WIP
 
 
 # Supported Unity Versions
@@ -88,5 +100,9 @@ WIP
 | 2022.X   | ❔ untested       |
 | 2023.X   | ❔ untested       |
 
+
 # FAQ
-wip
++ I want to use the generated logo for something else, how can I extract the texture/sprite from the splashdown file? (WIP)
++ I want to use 2 splashdown files: one for the app icon and a separate one for splash logo. How do I do that? (WIP)
++ Can I use a transparent color background ? 
+  

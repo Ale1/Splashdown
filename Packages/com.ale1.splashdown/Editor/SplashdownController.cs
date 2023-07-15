@@ -1,104 +1,89 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Android;
 using UnityEditor.Build;
 using UnityEditor.iOS;
 using UnityEngine;
+using UnityEngine.Android;
 
 namespace Splashdown.Editor
 {
     public static class SplashdownController
     {
-        private static PlayerSettings.SplashScreenLogo[] _backupLogos;
-        private static Dictionary<PlatformIconKind,PlatformIcon[]> _backupIcons;
+        private static Dictionary<string, SplashdownImporter> SplashdownRegistry;
+        private static SplashdownImporter LoadFromRegistry(string guid) => SplashdownRegistry[guid];
 
-        private static bool restoreSplash;
-        private static bool restoreIcons;
-
-        private static Splashdown.Options config => MySplashdown.Options;
-        private static Sprite sprite => MySplashdown.Sprite;
-
-  
-        private static SplashdownImporter _mySplashdown; //backing field.
-        public static SplashdownImporter MySplashdown
+        private static SplashdownImporter LoadFromAssetDatabase(string guid) => AssetDatabase.LoadAssetAtPath<SplashdownImporter>(AssetDatabase.GUIDToAssetPath(guid));
+        
+        public static void ValidateRegistry()
         {
-                get
+            if (SplashdownRegistry == null)
+            {
+                SplashdownRegistry = new Dictionary<string, SplashdownImporter>();
+            }
+
+            string[] assetPaths = AssetDatabase.GetAllAssetPaths();
+            foreach (var assetPath in assetPaths)
+            {
+                string extension = Path.GetExtension(assetPath);
+                if (extension == ".splashdown")
                 {
-                    if (_mySplashdown != null)
-                        return _mySplashdown;
-                
-                    string[] guids = AssetDatabase.FindAssets("");
-                    foreach (string guid in guids)
+                    string guid = AssetDatabase.AssetPathToGUID(assetPath);
+
+                    if (!SplashdownRegistry.ContainsKey(guid))
                     {
-                        string path = AssetDatabase.GUIDToAssetPath(guid);
-                        if(System.IO.Path.GetExtension(path) == ".splashdown")
-                        {
-                            _mySplashdown = (SplashdownImporter)AssetImporter.GetAtPath(path);
-                        }
+                        SplashdownRegistry[guid] = LoadFromAssetDatabase(guid);
                     }
-                    if(_mySplashdown == null)
-                        Debug.LogError("no splashdown found");
-                    return _mySplashdown;
                 }
-        }
-
-        public static void Build(Sprite sprite, float splashTime)
-        {
-            if (config == null)
-            {
-                Debug.LogError("something went wrong");
-                return;
-            }
-
-            if (sprite == null)
-            {
-                Debug.LogError("splashdown.Sprite is null");
-                return;
-            }
-            
-            if (config.useAsSplash)
-            {
-                restoreSplash = SetSplash(sprite, splashTime);
-            }
-            
-            if (config.useAsAppIcon)
-            {
-                restoreIcons = SetIcons(sprite);
-               
             }
         }
         
-
-        public static void Restore()
+        private static SplashdownImporter FindByName(string targetName)
         {
-            if(restoreSplash) RestoreSplash();
-            if(restoreIcons) RestoreIcons();
-            AssetDatabase.SaveAssets();
+            foreach (var kvp in SplashdownRegistry)
+            {
+                var splashdown = kvp.Value;
+                if (splashdown.name == targetName)
+                {
+                    return splashdown;
+                }
+            }
+            return null;
         }
+
+        public static void SetSplash(string targetName)
+        {
+            var splashdown = FindByName(targetName);
+            if (splashdown != null)
+            {
+                var handler = new LogoHandler(splashdown);
+                handler.SetSplash();
+            }
+            else
+            {
+                Debug.LogError($"{targetName} not found");
+            };
+        }
+
+        public static void RemoveSplash(string targetName)
+        {
+            var splashdown = FindByName(targetName);
+            if (splashdown != null)
+            {
+                var handler = new LogoHandler(splashdown);
+                handler.RemoveSplash();
+            }
+            else
+            {
+                Debug.LogError($"{targetName} is not a known splashdown");
+            }
+        }
+
         
-
-        private static bool SetSplash(Sprite sprite, float splashTime)
-        {
-            PlayerSettings.SplashScreenLogo[] backupLogos = PlayerSettings.SplashScreen.logos;
-            
-            if (sprite == null)
-            {
-                Debug.LogError("could not find splash logo");
-                return false;
-            }
-            
-            var splashdownLogo = PlayerSettings.SplashScreenLogo.Create(splashTime, sprite);
-
-            if (!backupLogos.Contains(splashdownLogo))
-            {
-                var tempLogos = backupLogos.PushToArray(splashdownLogo);
-                PlayerSettings.SplashScreen.logos = tempLogos;
-            }
-            return true;
-        }
-
+        private static Dictionary<PlatformIconKind, PlatformIcon[]> _backupIcons;
 
         private static bool SetIcons(Sprite sprite)
         {
@@ -143,12 +128,7 @@ namespace Splashdown.Editor
             }
             return true;
         }
-
-        private static void RestoreSplash()
-        {
-            PlayerSettings.SplashScreen.logos = _backupLogos;
-        }
-
+        
         private static void RestoreIcons()
         {
             if (FetchPlatform(out NamedBuildTarget platform))
@@ -198,19 +178,6 @@ namespace Splashdown.Editor
                     Debug.LogWarning("unsupported build target");
                     return false;
             }
-        }
-
-
-        /// <summary>
-        /// Push an item to index 0 of an array,
-        /// </summary>
-        /// <returns> returns a copy with modifications</returns>
-        private static T[] PushToArray<T>(this T[] originalArray, T newItem)
-        {
-            T[] newArray = new T[originalArray.Length + 1];
-            newArray[0] = newItem;
-            Array.Copy(originalArray, 0, newArray, 1, originalArray.Length);
-            return newArray;
         }
     }
 }

@@ -4,6 +4,8 @@ using UnityEditor;
 using UnityEngine;
 using UnityEditor.AssetImporters;
 using System.Reflection;
+using Codice.Client.BaseCommands;
+
 
 namespace Splashdown.Editor
 {
@@ -13,38 +15,46 @@ namespace Splashdown.Editor
         public bool useDynamicOptions;
 
 
-        [HideInInspector] public Font Font;
-        [HideInInspector] public Sprite Sprite;
+        public static Font defaultFont => AssetDatabase.LoadAssetAtPath<Font>("Packages/com.Ale1.splashdown/Editor/Splashdown_RobotoMono.ttf");
+        
         public Splashdown.Options Options;
         
+        public Sprite Sprite => AssetDatabase.LoadAssetAtPath<Sprite>($"{this.assetPath}/main sprite");
+        public Font Font =>AssetDatabase.LoadAssetAtPath<Font>($"{this.assetPath}/font");
+
 
         public override void OnImportAsset(AssetImportContext ctx)
         {
             ImportWithContext(ctx);
         }
-
-
+        
         private void ImportWithContext(AssetImportContext ctx)
         {
+            string filename = System.IO.Path.GetFileNameWithoutExtension(ctx.assetPath);
+            this.name = filename;
+                            
             if(useDynamicOptions)
-                Options = FetchDynamicOptions();
-            
+                Options = FetchDynamicOptions(name);
+
             if (Options == null)
+            {
                 Options = new Splashdown.Options();
-            
-            if (Font == null && Options.font == null)
-            {
-                Options.font = AssetDatabase.LoadAssetAtPath<Font>("Packages/com.Ale1.splashdown/Editor/Splashdown_RobotoMono.ttf");
-                Font = Options.font;
             }
-            else
+
+            Font font = null;
+            if (!String.IsNullOrEmpty(Options.fontGUID))
             {
-                Font = Options.font;
+                font = AssetDatabase.LoadAssetAtPath<Font>(
+                    AssetDatabase.GUIDToAssetPath(Options.fontGUID));
+            }
+
+            if(font == null)
+            {
+                font = defaultFont;
             }
             
-            if(Font == null) Debug.LogError("no font found");
-            ctx.AddObjectToAsset("font",Font);
-            
+            if(font == null) Debug.LogError("no font found");
+
             SplashdownGenerator.CreateTexture(ctx.assetPath, Options);
 
             // Load the file as bytes
@@ -62,19 +72,9 @@ namespace Splashdown.Editor
             ctx.AddObjectToAsset("main tex", texture);
             ctx.AddObjectToAsset("main sprite", sprite);
             ctx.SetMainObject(texture);
-
-            // Save the sprite and Config for easy retrieval later
-            Sprite = sprite;
             
-            if (Options.useAsSplash)
-            {
-                //todo: add or remove logo to splash
-            }
-
-            if (Options.useAsAppIcon)
-            {
-                //todo: add or remove sprite to icons
-            }
+            
+            SplashdownController.ValidateRegistry();
         }
      
         
@@ -92,7 +92,7 @@ namespace Splashdown.Editor
         /// The Splashdown.Options returned by the first valid method it finds,
         /// or null if no valid method is found.
         /// </returns>
-        private Splashdown.Options FetchDynamicOptions()
+        private Splashdown.Options FetchDynamicOptions(string targetName)
         {
             // Get all assemblies in the current AppDomain
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();

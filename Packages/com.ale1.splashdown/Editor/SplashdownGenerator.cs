@@ -110,8 +110,6 @@ namespace Splashdown.Editor
             
             File.WriteAllBytes(fullPath, bytes);
 
-            if (options.logging) Debug.Log("Texture saved at: " + fullPath);
-
             return texture;
         }
 
@@ -125,14 +123,12 @@ namespace Splashdown.Editor
                 text = text.Substring(0, 10);
                 Debug.LogWarning($"Splashdown ::: text is too long to fit, will be truncated: '{text}...'");
             }
-
-            //var font = Font.CreateDynamicFontFromOSFont("Courier New", FontSize); //todo: fallback to system font if custom one not found.
-            if (options.font == null)
-            {
-                Debug.Log("no font found");
-            }
-
+            
             var font = options.font;
+            if (font == null)
+            {
+                font = SplashdownImporter.defaultFont;
+            }
             var fontSize = font.fontSize;
 
             // Start text with 5% margin from the left

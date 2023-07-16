@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEditor.AssetImporters;
 using System.Reflection;
 using Codice.Client.BaseCommands;
+using UnityEngine.Serialization;
 
 
 namespace Splashdown.Editor
@@ -16,12 +17,19 @@ namespace Splashdown.Editor
 
 
         public static Font defaultFont => AssetDatabase.LoadAssetAtPath<Font>("Packages/com.Ale1.splashdown/Editor/Splashdown_RobotoMono.ttf");
-        
+
+        public static Splashdown.Options DeserializeOptions(string pathToSplashdown)
+        {
+            var serializedOptions = AssetDatabase.LoadAssetAtPath<TextAsset>($"/Options");
+            if (serializedOptions != null)
+            {
+                return JsonUtility.FromJson<Splashdown.Options>(serializedOptions.text);
+            }
+            return null;
+        }
+
         public Splashdown.Options Options;
         
-        public Sprite Sprite => AssetDatabase.LoadAssetAtPath<Sprite>($"{this.assetPath}/main sprite");
-        public Font Font =>AssetDatabase.LoadAssetAtPath<Font>($"{this.assetPath}/font");
-
 
         public override void OnImportAsset(AssetImportContext ctx)
         {
@@ -30,13 +38,10 @@ namespace Splashdown.Editor
         
         private void ImportWithContext(AssetImportContext ctx)
         {
-            string filename = System.IO.Path.GetFileNameWithoutExtension(ctx.assetPath);
-            this.name = filename;
-                            
             if(useDynamicOptions)
                 Options = FetchDynamicOptions(name);
 
-            if (Options == null)
+            if (Options== null)
             {
                 Options = new Splashdown.Options();
             }
@@ -67,14 +72,27 @@ namespace Splashdown.Editor
             // Create a sprite from the texture
             var sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
             sprite.name = "Generated";
+            
+            //save name of splashdown file in Options
+            string filename = System.IO.Path.GetFileNameWithoutExtension(ctx.assetPath);
+            this.name = filename;
+            Options.fileName = filename;
+            
+            // Set the sprite path in the options
+            Options.assetPath = $"{ctx.assetPath}";
+            
+            // Convert Options to a serialized object and save as a sub-asset
+            string jsonOptions = JsonUtility.ToJson(Options);
+            TextAsset serializedOptions = new TextAsset(jsonOptions)
+            {
+                name = "Options"
+            };
 
             // Add objects to the imported asset
             ctx.AddObjectToAsset("main tex", texture);
             ctx.AddObjectToAsset("main sprite", sprite);
+            ctx.AddObjectToAsset("Options", serializedOptions);
             ctx.SetMainObject(texture);
-            
-            
-            SplashdownController.ValidateRegistry();
         }
      
         

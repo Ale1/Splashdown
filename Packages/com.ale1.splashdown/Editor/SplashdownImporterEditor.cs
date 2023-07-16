@@ -14,8 +14,7 @@ namespace Splashdown.Editor
         {
             var importer = (SplashdownImporter)target;
             var options = importer.Options;
-
-            // Draw the other fields normally
+            
             DrawDefaultInspector();
 
             EditorGUI.BeginChangeCheck();
@@ -26,15 +25,19 @@ namespace Splashdown.Editor
             {
                 string path = AssetDatabase.GUIDToAssetPath(options.fontGUID);
                 
-                
                 EditorGUI.BeginDisabledGroup(true);
-                EditorGUILayout.TextField("Font Path", path);
+                EditorGUILayout.LabelField("Using Font:", path);
                 EditorGUI.EndDisabledGroup();
                 
                 options.fontAsset = (Font)EditorGUILayout.ObjectField("Font Selector", options.fontAsset, typeof(Font), false);
             }
             else
             {
+                
+                EditorGUI.BeginDisabledGroup(true);
+                EditorGUILayout.LabelField("Using Font:", "Splashdown Default (Roboto Mono)");
+                EditorGUI.EndDisabledGroup();
+                
                 options.fontAsset = (Font)EditorGUILayout.ObjectField("Font Selector", options.fontAsset, typeof(Font), false);
             }
 
@@ -51,6 +54,24 @@ namespace Splashdown.Editor
                     options.fontGUID = string.Empty;
                 }
             }
+            
+            EditorGUILayout.Space(20);
+            
+            
+            //todo: disable buttons if not relevant
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("Apply Logo", GUILayout.Width(88), GUILayout.Height(22)))
+            {
+                SplashdownController.SetSplash(importer.name);
+            }
+
+            if (GUILayout.Button("Remove Logo", GUILayout.Width(88), GUILayout.Height(22)))
+            {
+                SplashdownController.RemoveSplash(importer.name);
+            }
+            
+            EditorGUILayout.EndHorizontal();
+            
 
             ApplyRevertGUI();
         }

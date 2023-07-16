@@ -7,6 +7,9 @@ namespace Splashdown
     [Serializable]
     public class Options
     {
+        [HideInInspector]
+        public string fileName;
+        
         public Color backgroundColor = Color.black;
         public Color textColor = new Color(1f, 1f, 0.6f, 1f);
 
@@ -42,7 +45,30 @@ namespace Splashdown
                 return AssetDatabase.LoadAssetAtPath<Font>(path);
             }
         }
+        
+        
+        [HideInInspector]
+        public string assetPath;
 
+        public Sprite Sprite
+        {
+            get
+            {
+                var assets = AssetDatabase.LoadAllAssetsAtPath(assetPath);
+                
+                foreach (var asset in assets)
+                {
+                    if (asset is Sprite sprite && sprite.name == "Generated")
+                    {
+                        return sprite;
+                        break;
+                    }
+                }
+
+                throw new Exception("empty sprite");
+                return null;
+            }
+        }
         
     }
 }

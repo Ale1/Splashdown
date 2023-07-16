@@ -10,10 +10,10 @@ namespace Splashdown.Editor
         private Sprite sprite;
         private float splashTime;
         
-        public LogoHandler(SplashdownImporter splashdown)
+        public LogoHandler(Splashdown.Options options)
         {
-            sprite = splashdown.Sprite;
-            splashTime = splashdown.Options.SplashTime;
+            sprite = options.Sprite;
+            splashTime = options.SplashTime;
         }
         
         private bool HasLogo()
@@ -28,24 +28,37 @@ namespace Splashdown.Editor
             return false;
         }
 
-        public bool SetSplash()
+        private void ReplaceLogo()
         {
-            if (sprite == null)
-            {
-                Debug.LogError("could not find splash logo");
-                return false;
-            }
+            var allLogos = PlayerSettings.SplashScreen.logos;
+            int index = Array.FindIndex(allLogos, logo => logo.logo == sprite);
 
+            if (index != -1)
+            {
+                // Replace the logo at the found index with a new one.
+                allLogos[index] = PlayerSettings.SplashScreenLogo.Create(splashTime, sprite);
+                PlayerSettings.SplashScreen.logos = allLogos;
+            }
+            else
+            {
+                Debug.LogError("Logo not found in PlayerSettings.SplashScreen.logos.");
+            }
+        }
+
+        public void SetSplash()
+        {
             var allLogos = PlayerSettings.SplashScreen.logos;
             if (!HasLogo())
             {
                 var splashdownLogo = PlayerSettings.SplashScreenLogo.Create(splashTime, sprite);
                 allLogos = PushToArray(allLogos, splashdownLogo);
                 PlayerSettings.SplashScreen.logos = allLogos;
-                return true;
             }
-
-            return false;
+            else  //has logo, but lets replace it cause content could have changed
+            {
+                ReplaceLogo();
+            }
+            
         }
 
         public bool RemoveSplash()

@@ -1,54 +1,114 @@
-using System;
+
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using Splashdown.Editor;
 using UnityEditor;
 using UnityEditor.Android;
 using UnityEditor.Build;
 using UnityEditor.iOS;
 using UnityEngine;
-using UnityEngine.Android;
 
 namespace Splashdown.Editor
 {
     public static class SplashdownController
     {
-        private static Dictionary<string, SplashdownImporter> SplashdownRegistry;
-        private static SplashdownImporter LoadFromRegistry(string guid) => SplashdownRegistry[guid];
+        public static bool validated = false;
+        
+        private static Dictionary<string, Options> SplashdownRegistry;
+        private static Options LoadFromRegistry(string guid) => SplashdownRegistry[guid];
 
-        private static SplashdownImporter LoadFromAssetDatabase(string guid) => AssetDatabase.LoadAssetAtPath<SplashdownImporter>(AssetDatabase.GUIDToAssetPath(guid));
+        private static Options LoadFromAssetDatabase(string guid)
+        {
+            string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+            var name = System.IO.Path.GetFileNameWithoutExtension(assetPath);
+            Splashdown.Options options = null;
+
+            // Load all assets and sub-assets at the asset path.
+            Object[] allAssets = AssetDatabase.LoadAllAssetsAtPath(assetPath);
+
+            // Search for the "Options" sub-asset.
+            foreach (var asset in allAssets)
+            {
+                if (asset is TextAsset textAsset && textAsset.name == "Options")
+                {
+                    // Found the "Options" sub-asset. Deserialize it.
+                    options = JsonUtility.FromJson<Splashdown.Options>(textAsset.text);
+                    
+                    if(options == null)
+                        Debug.LogError("unable to deserialize");
+                    
+                    break;
+                }
+            }
+
+            if(options == null)
+                Debug.LogError($"Unable to load Options from path: {assetPath}");
+    
+            return options;
+        }
         
         public static void ValidateRegistry()
         {
             if (SplashdownRegistry == null)
             {
-                SplashdownRegistry = new Dictionary<string, SplashdownImporter>();
+                SplashdownRegistry = new Dictionary<string, Options>();
             }
 
             string[] assetPaths = AssetDatabase.GetAllAssetPaths();
+
+            // Create a HashSet containing all the GUIDs of .splashdown files in the project.
+            HashSet<string> splashdownGuids = new HashSet<string>();
             foreach (var assetPath in assetPaths)
             {
                 string extension = Path.GetExtension(assetPath);
-                if (extension == ".splashdown")
+                // Ignore directories that end in .splashdown, like the package folder!
+                if (extension == ".splashdown" && !Directory.Exists(assetPath))
                 {
                     string guid = AssetDatabase.AssetPathToGUID(assetPath);
-
+                    splashdownGuids.Add(guid);
+            
                     if (!SplashdownRegistry.ContainsKey(guid))
-                    {
+                    { 
                         SplashdownRegistry[guid] = LoadFromAssetDatabase(guid);
                     }
                 }
             }
+
+            // Remove any keys from the registry that are not in the set of splashdown GUIDs.
+            List<string> keysToRemove = new List<string>();
+            foreach (var guid in SplashdownRegistry.Keys)
+            {
+                if (!splashdownGuids.Contains(guid))
+                {
+                    keysToRemove.Add(guid);
+                }
+            }
+
+            foreach (var guid in keysToRemove)
+            {
+                SplashdownRegistry.Remove(guid);
+            }
+
+            validated = true;
         }
         
-        private static SplashdownImporter FindByName(string targetName)
+        private static Options FindByName(string targetName)
         {
+            if(!validated)
+                ValidateRegistry();
+            
             foreach (var kvp in SplashdownRegistry)
             {
-                var splashdown = kvp.Value;
-                if (splashdown.name == targetName)
+                var options = kvp.Value;
+
+                if(options == null)
                 {
-                    return splashdown;
+                    Debug.LogError("there is an empty options in the splashdown registry");
+                }
+                
+                if (options.fileName == targetName)
+                {
+                    return options;
                 }
             }
             return null;
@@ -56,10 +116,13 @@ namespace Splashdown.Editor
 
         public static void SetSplash(string targetName)
         {
-            var splashdown = FindByName(targetName);
-            if (splashdown != null)
+            if(!validated)
+                ValidateRegistry();
+            
+            var splashdownData = FindByName(targetName);
+            if (splashdownData != null)
             {
-                var handler = new LogoHandler(splashdown);
+                var handler = new LogoHandler(splashdownData);
                 handler.SetSplash();
             }
             else
@@ -71,15 +134,9 @@ namespace Splashdown.Editor
         public static void RemoveSplash(string targetName)
         {
             var splashdown = FindByName(targetName);
-            if (splashdown != null)
-            {
-                var handler = new LogoHandler(splashdown);
-                handler.RemoveSplash();
-            }
-            else
-            {
-                Debug.LogError($"{targetName} is not a known splashdown");
-            }
+            var handler = new LogoHandler(splashdown);
+            handler.RemoveSplash();
+            
         }
 
         

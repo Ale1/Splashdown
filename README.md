@@ -1,6 +1,6 @@
 
 # 🟥 NOTICE 🟥
-This is WIP and version 1.0.0 will be released soon on OpenNPM! (Exepcted July 25 - 2023)
+This is WIP and version 1.0.0 will be released soon on OpenNPM! (Expected July 29 - 2023)
 
 〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️
 
@@ -77,9 +77,10 @@ WIP : how to force splashdown to refresh via script.
 <b>If you wish to automatically include the splashdown icon on every build, proceed....</b>
 <br/><br/>
 
-## (3) Add Splashdown to your build pipeline
-+ WIP
 
+## (3) Add Splashdown to your build pipeline through CLI
+
+_yourUnityPath_ -batchmode -quit -projectPath _yourProjectPath_ -executeMethod Splashdown.Editor.CommandLineInterpreter.SetSplashWithOptions -name MySplashdown -l1 hello -l2 banana -l3 world
 
 # Advanced Customization
 ## Switching Fonts
@@ -106,4 +107,8 @@ WIP : how to force splashdown to refresh via script.
 + I want to use the generated logo for something else, how can I extract the texture/sprite from the splashdown file? (WIP)
 + I want to use 2 splashdown files: one for the app icon and a separate one for splash logo. How do I do that? (WIP)
 + Can I use a transparent color background ? 
++ Can I use asian alphabets (e.g kanji) ?   
+   Yes!  but you will likely need to provide your own font as the built-in fonts are very limited in the amount of characters available.  See instructions for switching fonts. 
+
+
   

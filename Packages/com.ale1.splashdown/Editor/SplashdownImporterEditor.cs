@@ -13,7 +13,7 @@ namespace Splashdown.Editor
         public override void OnInspectorGUI()
         {
             var importer = (SplashdownImporter)target;
-            var options = importer.Options;
+            var options = importer.options;
             
             DrawDefaultInspector();
 

@@ -1,7 +1,7 @@
 
 using System.Collections.Generic;
 using System.IO;
-using Splashdown.Editor;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Android;
 using UnityEditor.Build;
@@ -12,12 +12,12 @@ namespace Splashdown.Editor
 {
     public static class SplashdownController
     {
-        public static bool validated = false;
+        private static bool validated = false;
         
         private static Dictionary<string, Options> SplashdownRegistry;
         private static Options LoadFromRegistry(string guid) => SplashdownRegistry[guid];
 
-        private static Options LoadFromAssetDatabase(string guid)
+        private static Options LoadOptionsFromAssetDatabase(string guid)
         {
             string assetPath = AssetDatabase.GUIDToAssetPath(guid);
             var name = System.IO.Path.GetFileNameWithoutExtension(assetPath);
@@ -46,8 +46,8 @@ namespace Splashdown.Editor
     
             return options;
         }
-        
-        public static void ValidateRegistry()
+
+        private static void ValidateRegistry()
         {
             if (SplashdownRegistry == null)
             {
@@ -69,7 +69,7 @@ namespace Splashdown.Editor
             
                     if (!SplashdownRegistry.ContainsKey(guid))
                     { 
-                        SplashdownRegistry[guid] = LoadFromAssetDatabase(guid);
+                        SplashdownRegistry[guid] = LoadOptionsFromAssetDatabase(guid);
                     }
                 }
             }
@@ -91,8 +91,8 @@ namespace Splashdown.Editor
 
             validated = true;
         }
-        
-        private static Options FindByName(string targetName)
+
+        public static Options GetOptionsByName(string targetName)
         {
             if(!validated)
                 ValidateRegistry();
@@ -106,20 +106,20 @@ namespace Splashdown.Editor
                     Debug.LogError("there is an empty options in the splashdown registry");
                 }
                 
-                if (options.fileName == targetName)
+                if (options?.fileName == targetName)
                 {
                     return options;
                 }
             }
             return null;
         }
+        
+        
 
+        //Can be called through CLI
         public static void SetSplash(string targetName)
         {
-            if(!validated)
-                ValidateRegistry();
-            
-            var splashdownData = FindByName(targetName);
+            var splashdownData = GetOptionsByName(targetName);
             if (splashdownData != null)
             {
                 var handler = new LogoHandler(splashdownData);
@@ -130,16 +130,16 @@ namespace Splashdown.Editor
                 Debug.LogError($"{targetName} not found");
             };
         }
+        
 
         public static void RemoveSplash(string targetName)
         {
-            var splashdown = FindByName(targetName);
+            var splashdown = GetOptionsByName(targetName);
             var handler = new LogoHandler(splashdown);
             handler.RemoveSplash();
             
         }
 
-        
         private static Dictionary<PlatformIconKind, PlatformIcon[]> _backupIcons;
 
         private static bool SetIcons(Sprite sprite)

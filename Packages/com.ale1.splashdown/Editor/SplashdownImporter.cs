@@ -16,8 +16,10 @@ namespace Splashdown.Editor
         public bool useDynamicOptions;
 
 
-        public static Font defaultFont => AssetDatabase.LoadAssetAtPath<Font>("Packages/com.Ale1.splashdown/Editor/Splashdown_RobotoMono.ttf");
-
+        public static Font DefaultFont => AssetDatabase.LoadAssetAtPath<Font>("Packages/com.Ale1.splashdown/Editor/Splashdown_RobotoMono.ttf");
+        
+        public Splashdown.Options options;
+        
         public static Splashdown.Options DeserializeOptions(string pathToSplashdown)
         {
             var serializedOptions = AssetDatabase.LoadAssetAtPath<TextAsset>($"/Options");
@@ -28,9 +30,6 @@ namespace Splashdown.Editor
             return null;
         }
 
-        public Splashdown.Options Options;
-        
-
         public override void OnImportAsset(AssetImportContext ctx)
         {
             ImportWithContext(ctx);
@@ -38,29 +37,29 @@ namespace Splashdown.Editor
         
         private void ImportWithContext(AssetImportContext ctx)
         {
+            
+            
+            
             if(useDynamicOptions)
-                Options = FetchDynamicOptions(name);
+                options = FetchDynamicOptions(name);   //todo: filter by targetName
 
-            if (Options== null)
-            {
-                Options = new Splashdown.Options();
-            }
+            options = CommandLineInterpreter.ProvideOptions();
 
             Font font = null;
-            if (!String.IsNullOrEmpty(Options.fontGUID))
+            if (!String.IsNullOrEmpty(options.fontGUID))
             {
                 font = AssetDatabase.LoadAssetAtPath<Font>(
-                    AssetDatabase.GUIDToAssetPath(Options.fontGUID));
+                    AssetDatabase.GUIDToAssetPath(options.fontGUID));
             }
 
             if(font == null)
             {
-                font = defaultFont;
+                font = DefaultFont;
             }
             
             if(font == null) Debug.LogError("no font found");
 
-            SplashdownGenerator.CreateTexture(ctx.assetPath, Options);
+            SplashdownGenerator.CreateTexture(ctx.assetPath, options);
 
             // Load the file as bytes
             var fileData = System.IO.File.ReadAllBytes(ctx.assetPath);
@@ -76,13 +75,13 @@ namespace Splashdown.Editor
             //save name of splashdown file in Options
             string filename = System.IO.Path.GetFileNameWithoutExtension(ctx.assetPath);
             this.name = filename;
-            Options.fileName = filename;
+            options.fileName = filename;
             
             // Set the sprite path in the options
-            Options.assetPath = $"{ctx.assetPath}";
+            options.assetPath = $"{ctx.assetPath}";
             
             // Convert Options to a serialized object and save as a sub-asset
-            string jsonOptions = JsonUtility.ToJson(Options);
+            string jsonOptions = JsonUtility.ToJson(options);
             TextAsset serializedOptions = new TextAsset(jsonOptions)
             {
                 name = "Options"
@@ -97,20 +96,16 @@ namespace Splashdown.Editor
      
         
         /// <summary>
-        /// Fetches dynamic Splashdown options by searching all assemblies for a method
-        /// marked with the Splashdown.OptionsProviderAttribute that has the correct signature.
+        /// Fetches dynamic Splashdown options by searching all assemblies for a method marked with the Splashdown.OptionsProviderAttribute that has the correct signature.
         /// </summary>
         /// <remarks>
-        /// This implementation will return the options from the first valid method it finds.
         /// If there are multiple methods in the assemblies that are marked with the Splashdown.OptionsProviderAttribute and have the correct signature,
         /// this method is non-deterministic and it's not guaranteed to return the options from the same method every time.
-        /// The order in which types and methods are returned by the reflection methods is not guaranteed.
         /// </remarks>
         /// <returns>
-        /// The Splashdown.Options returned by the first valid method it finds,
-        /// or null if no valid method is found.
+        /// The Splashdown.Options returned by the first valid method it finds, or null if no valid method is found.
         /// </returns>
-        private Splashdown.Options FetchDynamicOptions(string targetName)
+        private Splashdown.Options FetchDynamicOptions(string targetName) 
         {
             // Get all assemblies in the current AppDomain
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -139,7 +134,7 @@ namespace Splashdown.Editor
                                 continue;
                             }
 
-                            // If we get here, the method is valid, so we invoke it and return the result
+                            // If we get here, the method is valid
                             return (Splashdown.Options)method.Invoke(null, null);
                         }
                     }
@@ -147,5 +142,6 @@ namespace Splashdown.Editor
             }
             return null; // or throw an exception
         }
+        
     }
 }

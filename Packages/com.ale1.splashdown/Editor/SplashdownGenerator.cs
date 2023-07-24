@@ -7,7 +7,7 @@ namespace Splashdown.Editor
     public static class SplashdownGenerator
     {
         
-        const string defaultFilename = "MySplashdown.splashdown"; 
+        const string DefaultFilename = "MySplashdown.splashdown"; 
         
         [MenuItem("Assets/Create/New Splashdown")]
         public static void CreateNewSplashdownFromContextMenu()
@@ -20,12 +20,12 @@ namespace Splashdown.Editor
             }
             else if (Directory.Exists(targetPath)) // its a directory.
             {
-                targetPath = Path.Combine(targetPath, defaultFilename);
+                targetPath = Path.Combine(targetPath, DefaultFilename);
             }
             else if (Path.GetExtension(targetPath) != "") //path is pointing to a file.  Use same location but use default filename.
             {
                 targetPath = targetPath.Replace(Path.GetFileName(AssetDatabase.GetAssetPath(Selection.activeObject)), "");
-                targetPath = Path.Combine(targetPath, defaultFilename);
+                targetPath = Path.Combine(targetPath, DefaultFilename);
             }
 
             var options = new Splashdown.Options();
@@ -127,7 +127,7 @@ namespace Splashdown.Editor
             var font = options.font;
             if (font == null)
             {
-                font = SplashdownImporter.defaultFont;
+                font = SplashdownImporter.DefaultFont;
             }
             var fontSize = font.fontSize;
 

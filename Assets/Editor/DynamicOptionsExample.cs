@@ -3,7 +3,6 @@ using UnityEngine;
 public static class Example  
 {
         
-
         [Splashdown.OptionsProvider]
         public static Splashdown.Options ProvideSplashdownOptions() => new()
         {

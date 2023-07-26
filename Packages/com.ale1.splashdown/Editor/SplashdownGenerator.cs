@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using System.IO;
 using UnityEditor;
@@ -28,7 +29,7 @@ namespace Splashdown.Editor
                 targetPath = Path.Combine(targetPath, DefaultFilename);
             }
 
-            var options = new Splashdown.Options();
+            var options = new Splashdown.Options(true);
             GenerateSplashdownFile(targetPath, options);
         }
         
@@ -56,13 +57,16 @@ namespace Splashdown.Editor
             var texture = new Texture2D(360, 360, TextureFormat.RGBA32, false);
 
             if (options == null)
-                options = new Splashdown.Options(); 
+            {
+                options = new Splashdown.Options(true);
+            }
             
+
             // Fill the texture with the background color 
             Color[] pixels = new Color[texture.width * texture.height];
             for (int i = 0; i < pixels.Length; i++)
             {
-                pixels[i] = options.backgroundColor;
+                pixels[i] = (UnityEngine.Color) options.backgroundColor;
             }
 
             texture.SetPixels(pixels);
@@ -78,22 +82,22 @@ namespace Splashdown.Editor
             // Create a counter for current line
             int currentLine = 0;
 
-            // Add non-empty text lines to the texture
-            if (options.hasLine1)
+            // Add non-null text lines to the texture
+            if (options.line1 != null)
             {
                 texture.AddText(options.line1, Mathf.FloorToInt(buffer + lineHeight * (nonEmptyLines - 1 - currentLine)), options);
                 texture.Apply();
                 currentLine++;
             }
 
-            if (options.hasLine2)
+            if (options.line2 != null)
             {
                 texture.AddText(options.line2, Mathf.FloorToInt(buffer + lineHeight * (nonEmptyLines - 1 - currentLine)), options);
                 texture.Apply();
                 currentLine++;
             }
 
-            if (options.hasLine3)
+            if (options.line3 != null)
             {
                 texture.AddText(options.line3, Mathf.FloorToInt(buffer + lineHeight * (nonEmptyLines - 1 - currentLine)), options);
                 texture.Apply();
@@ -127,7 +131,7 @@ namespace Splashdown.Editor
             var font = options.font;
             if (font == null)
             {
-                font = SplashdownImporter.DefaultFont;
+                font = Options.DefaultFont;
             }
             var fontSize = font.fontSize;
 
@@ -139,12 +143,12 @@ namespace Splashdown.Editor
             RenderTexture.active = rt;
 
             // Clear the RenderTexture to desired color
-            GL.Clear(true, true, options.backgroundColor);
+            GL.Clear(true, true, (UnityEngine.Color) options.backgroundColor);
 
             Material fontMaterial = new Material(Shader.Find("GUI/Text Shader"));
 
             // Set the text color
-            fontMaterial.SetColor("_Color", options.textColor);
+            fontMaterial.SetColor("_Color", (UnityEngine.Color) options.textColor);
 
             fontMaterial.mainTexture = font.material.mainTexture;
 

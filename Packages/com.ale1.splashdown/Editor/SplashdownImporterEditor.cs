@@ -13,12 +13,26 @@ namespace Splashdown.Editor
         public override void OnInspectorGUI()
         {
             var importer = (SplashdownImporter)target;
-            var options = importer.options;
+            Options options = SplashdownImporter.DeserializeOptions(importer.assetPath);
             
             DrawDefaultInspector();
-
+            
+            // Draw the Options fields
             EditorGUI.BeginChangeCheck();
+            options.line1 = EditorGUILayout.TextField("Line 1", options.line1);
+            options.line2 = EditorGUILayout.TextField("Line 2", options.line2);
+            options.line3 = EditorGUILayout.TextField("Line 3", options.line3);
+            options.backgroundColor = EditorGUILayout.ColorField("Background Color", (UnityEngine.Color) options.backgroundColor);
+            options.textColor = EditorGUILayout.ColorField("Text Color Color", (UnityEngine.Color) options.textColor);
+            
 
+            if (EditorGUI.EndChangeCheck())
+            {
+                importer.inspectorOptions = options;
+                EditorUtility.SetDirty(importer);
+            }
+            
+            EditorGUI.BeginChangeCheck();
             EditorGUILayout.Space(40);
 
             if (!string.IsNullOrEmpty(options.fontGUID))
@@ -53,6 +67,9 @@ namespace Splashdown.Editor
                 {
                     options.fontGUID = string.Empty;
                 }
+
+                importer.inspectorOptions = options;
+                EditorUtility.SetDirty(importer);
             }
             
             EditorGUILayout.Space(20);

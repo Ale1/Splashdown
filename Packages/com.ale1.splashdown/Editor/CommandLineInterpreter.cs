@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using Splashdown.Editor;
 using UnityEngine;
 using UnityEditor;
@@ -10,16 +11,13 @@ namespace Splashdown.Editor
     public class CommandLineInterpreter
     {
         //e.g // /Applications/Unity/Unity.app/Contents/MacOS/Unity -quit -batchmode -projectPath ~/UnityProjects/MyProject -executeMethod MyEditorScript.PerformSetSplashWithOptions -name MySplashdown -l1 hello -l2 cruel -l3 world
-
-        private static Options _options;
-
-
         public CommandLineInterpreter()
         {
-            _options = null;
+            
         }
 
-        public static void PerformSetSplashWithOptions()
+        [MenuItem("Splashdown/test")]
+        public static void SetSplashOptions()
         {
             string[] args = System.Environment.GetCommandLineArgs();
             string name = null;
@@ -35,25 +33,43 @@ namespace Splashdown.Editor
                 else if (args[i] == "-l3") l3 = args[i + 1];
             }
 
-            _options = new()
-            {
-                line1 = l1,
-                line2 = l2,
-                line3 = l3,
-                textColor = Color.red
-            };
+            name = "MySplashdown"; //todo: remove
             
-            var splashdownData = SplashdownController.GetOptionsByName(name);
-            splashdownData.line1 = l1 ?? splashdownData.line1;
-            splashdownData.line1 = l2 ?? splashdownData.line2;
-            splashdownData.line1 = l3 ?? splashdownData.line3;
+            if (name == null)
+            {
+                //todo: if no name is passed, just use the first found.
+                Debug.LogError("name cannot be empty");
+                return;
+            }
+                
 
-            _options = splashdownData;
-        }
+            Options newOpts = new(false)
+            {
+                line1 = "handsome", //l1, //todo: remove
+                line2 = "banana", //l2, //todo: remove
+                line3 = l3,
+            };
 
-        public static Options ProvideOptions()
-        {
-            return _options;
+            var guid = SplashdownController.FindSplashdownByName(name);
+            
+            var splashdownData = SplashdownController.LoadOptionsFromAssetDatabase(guid);
+            
+            if (splashdownData == null)
+            {
+                Debug.LogError($"no splashdown file found with name {name}");
+                return;
+            }
+
+            splashdownData.UpdateWith(newOpts);
+            
+            var key = "com.ale1.Splashdown." + name;  //todo: move to constants
+            var value = JsonUtility.ToJson(splashdownData);
+            Debug.Log("key:" + "com.ale1.Splashdown."+name);
+            EditorPrefs.SetString(key, value);
+            
+         
+            string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+            AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceSynchronousImport);
         }
     }
 }

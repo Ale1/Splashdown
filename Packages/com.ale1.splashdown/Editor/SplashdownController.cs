@@ -1,7 +1,7 @@
 
 using System.Collections.Generic;
 using System.IO;
-using Splashdown.Editor;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Android;
 using UnityEditor.Build;
@@ -12,13 +12,37 @@ namespace Splashdown.Editor
 {
     public static class SplashdownController
     {
-        public static bool validated = false;
         
-        private static Dictionary<string, Options> SplashdownRegistry;
-        private static Options LoadFromRegistry(string guid) => SplashdownRegistry[guid];
-
-        private static Options LoadFromAssetDatabase(string guid)
+        public static string FindSplashdownByName(string name)
         {
+            // Get all the .splashdown file guids in the AssetDatabase.
+            string[] splashdownGUIDs = AssetDatabase.FindAssets("", new[] { "Assets" }).Where(guid =>
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                return Path.GetExtension(path) == ".splashdown";
+            }).ToArray();
+
+            // Search for a .splashdown file with the target name.
+            foreach (string guid in splashdownGUIDs)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                string filename = Path.GetFileNameWithoutExtension(path);
+                if (filename == name)
+                {
+                    // Found a .splashdown file with the target name.
+                    return guid;
+                }
+            }
+
+            // Didn't find a .splashdown file with the target name.
+            return null;
+        }
+        
+        public static Options LoadOptionsFromAssetDatabase(string guid)
+        {
+            if (guid == null)
+                return null;
+            
             string assetPath = AssetDatabase.GUIDToAssetPath(guid);
             var name = System.IO.Path.GetFileNameWithoutExtension(assetPath);
             Splashdown.Options options = null;
@@ -46,100 +70,36 @@ namespace Splashdown.Editor
     
             return options;
         }
+
         
-        public static void ValidateRegistry()
-        {
-            if (SplashdownRegistry == null)
-            {
-                SplashdownRegistry = new Dictionary<string, Options>();
-            }
 
-            string[] assetPaths = AssetDatabase.GetAllAssetPaths();
-
-            // Create a HashSet containing all the GUIDs of .splashdown files in the project.
-            HashSet<string> splashdownGuids = new HashSet<string>();
-            foreach (var assetPath in assetPaths)
-            {
-                string extension = Path.GetExtension(assetPath);
-                // Ignore directories that end in .splashdown, like the package folder!
-                if (extension == ".splashdown" && !Directory.Exists(assetPath))
-                {
-                    string guid = AssetDatabase.AssetPathToGUID(assetPath);
-                    splashdownGuids.Add(guid);
-            
-                    if (!SplashdownRegistry.ContainsKey(guid))
-                    { 
-                        SplashdownRegistry[guid] = LoadFromAssetDatabase(guid);
-                    }
-                }
-            }
-
-            // Remove any keys from the registry that are not in the set of splashdown GUIDs.
-            List<string> keysToRemove = new List<string>();
-            foreach (var guid in SplashdownRegistry.Keys)
-            {
-                if (!splashdownGuids.Contains(guid))
-                {
-                    keysToRemove.Add(guid);
-                }
-            }
-
-            foreach (var guid in keysToRemove)
-            {
-                SplashdownRegistry.Remove(guid);
-            }
-
-            validated = true;
-        }
-        
-        private static Options FindByName(string targetName)
-        {
-            if(!validated)
-                ValidateRegistry();
-            
-            foreach (var kvp in SplashdownRegistry)
-            {
-                var options = kvp.Value;
-
-                if(options == null)
-                {
-                    Debug.LogError("there is an empty options in the splashdown registry");
-                }
-                
-                if (options.fileName == targetName)
-                {
-                    return options;
-                }
-            }
-            return null;
-        }
-
+        //Can be called through CLI
         public static void SetSplash(string targetName)
         {
-            if(!validated)
-                ValidateRegistry();
+            var guid = FindSplashdownByName(targetName);
+            if (guid == null)
+            {
+                Debug.LogError($"{targetName} not found");
+                return;
+            }
             
-            var splashdownData = FindByName(targetName);
+            var splashdownData = LoadOptionsFromAssetDatabase(guid);
             if (splashdownData != null)
             {
                 var handler = new LogoHandler(splashdownData);
                 handler.SetSplash();
             }
-            else
-            {
-                Debug.LogError($"{targetName} not found");
-            };
         }
+        
 
         public static void RemoveSplash(string targetName)
         {
-            var splashdown = FindByName(targetName);
-            var handler = new LogoHandler(splashdown);
+            var guid = FindSplashdownByName(targetName);
+            var splashDownData = LoadOptionsFromAssetDatabase(guid);
+            var handler = new LogoHandler(splashDownData);
             handler.RemoveSplash();
-            
         }
 
-        
         private static Dictionary<PlatformIconKind, PlatformIcon[]> _backupIcons;
 
         private static bool SetIcons(Sprite sprite)

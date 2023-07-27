@@ -12,8 +12,8 @@ namespace Splashdown.Editor
 {
     public static class SplashdownController
     {
-        
-        public static string FindSplashdownByName(string name)
+
+        public static string[] FindAllSplashdownFiles()
         {
             // Get all the .splashdown file guids in the AssetDatabase.
             string[] splashdownGUIDs = AssetDatabase.FindAssets("", new[] { "Assets" }).Where(guid =>
@@ -22,6 +22,13 @@ namespace Splashdown.Editor
                 return Path.GetExtension(path) == ".splashdown";
             }).ToArray();
 
+            return splashdownGUIDs;
+        }
+        
+        public static string FindSplashdownByName(string name)
+        {
+            var splashdownGUIDs = FindAllSplashdownFiles();
+            
             // Search for a .splashdown file with the target name.
             foreach (string guid in splashdownGUIDs)
             {
@@ -38,7 +45,7 @@ namespace Splashdown.Editor
             return null;
         }
         
-        public static Options LoadOptionsFromAssetDatabase(string guid)
+        public static Options LoadOptionsFromSplashdownFile(string guid)
         {
             if (guid == null)
                 return null;
@@ -83,7 +90,7 @@ namespace Splashdown.Editor
                 return;
             }
             
-            var splashdownData = LoadOptionsFromAssetDatabase(guid);
+            var splashdownData = LoadOptionsFromSplashdownFile(guid);
             if (splashdownData != null)
             {
                 var handler = new LogoHandler(splashdownData);
@@ -95,7 +102,7 @@ namespace Splashdown.Editor
         public static void RemoveSplash(string targetName)
         {
             var guid = FindSplashdownByName(targetName);
-            var splashDownData = LoadOptionsFromAssetDatabase(guid);
+            var splashDownData = LoadOptionsFromSplashdownFile(guid);
             var handler = new LogoHandler(splashDownData);
             handler.RemoveSplash();
         }
@@ -114,7 +121,7 @@ namespace Splashdown.Editor
 
             NamedBuildTarget platform;
             PlatformIconKind[] kinds;
-            if (!FetchPlatform(out platform) || !FetchIconKind(out kinds))
+            if (!GetPlatform(out platform) || !FetchIconKind(out kinds))
             {
                 return false;
             }
@@ -148,7 +155,7 @@ namespace Splashdown.Editor
         
         private static void RestoreIcons()
         {
-            if (FetchPlatform(out NamedBuildTarget platform))
+            if (GetPlatform(out NamedBuildTarget platform))
             {
                 foreach (var entry in _backupIcons)
                 {
@@ -179,7 +186,7 @@ namespace Splashdown.Editor
             }
         }
 
-        private static bool FetchPlatform(out NamedBuildTarget platform)
+        private static bool GetPlatform(out NamedBuildTarget platform)
         {
             BuildTarget currentBuildTarget = EditorUserBuildSettings.activeBuildTarget;
             switch (currentBuildTarget)

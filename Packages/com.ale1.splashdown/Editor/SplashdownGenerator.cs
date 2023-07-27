@@ -48,7 +48,7 @@ namespace Splashdown.Editor
             SplashdownImporter importer = (SplashdownImporter)AssetImporter.GetAtPath(targetPath);
             EditorUtility.SetDirty(importer);
             importer.SaveAndReimport();
-            AssetDatabase.ImportAsset(targetPath);
+            AssetDatabase.ImportAsset(targetPath); //todo: check if this necessary?
         }
         
         public static Texture2D CreateTexture(string targetPath, Splashdown.Options options)

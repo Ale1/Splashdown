@@ -64,7 +64,8 @@ namespace Splashdown.Editor
                 options = new Options(true);
             }
             
-            options.UpdateWith(inspectorOptions);
+            if(inspectorOptions != null)
+                options.UpdateWith(inspectorOptions);
 
             if (useDynamicOptions)
             {

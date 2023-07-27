@@ -52,7 +52,7 @@ namespace Splashdown.Editor
 
             var guid = SplashdownController.FindSplashdownByName(name);
             
-            var splashdownData = SplashdownController.LoadOptionsFromAssetDatabase(guid);
+            var splashdownData = SplashdownController.LoadOptionsFromSplashdownFile(guid);
             
             if (splashdownData == null)
             {

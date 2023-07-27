@@ -72,15 +72,29 @@ public static class Example
 }
 ```
 
-WIP : how to force splashdown to refresh via script. 
 
 <b>If you wish to automatically include the splashdown icon on every build, proceed....</b>
 <br/><br/>
 
 
-## (3) Add Splashdown to your build pipeline through CLI
+## (3) Add splashdown to your build pipeline through build script. 
 
-_yourUnityPath_ -batchmode -quit -projectPath _yourProjectPath_ -executeMethod Splashdown.Editor.CommandLineInterpreter.SetSplashWithOptions -name MySplashdown -l1 hello -l2 banana -l3 world
+WIP.  Set option *regenerate on build* to true.  This will create a new icon as a build step and apply it to project settings.
+
+
+## (4) Add Splashdown to your build pipeline through CLI
+
+_yourUnityPath_ -batchmode -quit -projectPath _yourProjectPath_ -executeMethod Splashdown.Editor.CommandLineInterpreter.SetSplashOptions -name MySplashdown -l1 hello -l2 banana -l3 world
+
+Note:  You can provide options through multiple avenues.  The order of priority (most to least) is: 
+(1) Dynamic Options.  
+(2) CLI Options
+(2) Options set manually in inspector.  
+(3) Default Options
+
+If you dont wish Dynamic options to override CLI options, you may disable them by passing optional flag "-disableDynamic".  
+
+
 
 # Advanced Customization
 ## Switching Fonts

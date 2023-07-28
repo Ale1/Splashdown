@@ -1,8 +1,8 @@
 {
   "name": "com.ale1.splashdown",
-  "version": "0.4.0",
+  "version": "0.7.0",
   "displayName": "Splashdown",
-  "description": "Custom Runtime Splash and Icon generator",
+  "description": "Custom Editor Splash and Icon generator",
   "documentationUrl": "",
   "changelogUrl": "CHANGELOG.MD",
   "licensesUrl": "LICENCE.MD",

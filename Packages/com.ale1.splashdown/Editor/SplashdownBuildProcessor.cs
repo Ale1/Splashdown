@@ -1,5 +1,3 @@
-using System.IO;
-using System.Linq;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
@@ -19,8 +17,10 @@ namespace Splashdown.Editor
 
         public void OnPreprocessBuild(BuildReport report)
         {
+            if (Application.isBatchMode)
+                return;
+            
             var guids = SplashdownController.FindAllSplashdownFiles();
-            Debug.Log(guids.Length);
             foreach (var guid in guids)
             {
                 var path = AssetDatabase.GUIDToAssetPath(guid);
@@ -32,8 +32,12 @@ namespace Splashdown.Editor
                     break;  //only use first match
                 }
             }
-            if(activeSplashdown != null)
+
+            if (activeSplashdown != null)
+            {
                 SplashdownController.SetSplash(activeSplashdown.name);
+                SplashdownController.SetIcons(activeSplashdown.name);
+            }
             else
             {
                 Debug.Log("nothing found");
@@ -43,9 +47,13 @@ namespace Splashdown.Editor
         [PostProcessBuild(1)]
         public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
         {
+            if (Application.isBatchMode)
+                return;
+            
             if (activeSplashdown != null)
             {
                 SplashdownController.RemoveSplash(activeSplashdown.name);
+                SplashdownController.RestoreIcons();
                 activeSplashdown = null;
             }
         

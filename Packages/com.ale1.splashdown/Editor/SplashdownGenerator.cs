@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using System.IO;
 using UnityEditor;
@@ -8,7 +7,7 @@ namespace Splashdown.Editor
     public static class SplashdownGenerator
     {
         
-        const string DefaultFilename = "MySplashdown.splashdown"; 
+        const string DefaultFilename = "MySplashdown" +"." + Constants.SplashdownExtension; 
         
         [MenuItem("Assets/Create/New Splashdown")]
         public static void CreateNewSplashdownFromContextMenu()

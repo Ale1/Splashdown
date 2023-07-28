@@ -26,7 +26,7 @@ namespace Splashdown.Editor
                 var path = AssetDatabase.GUIDToAssetPath(guid);
                 SplashdownImporter importer = (SplashdownImporter) AssetImporter.GetAtPath(path);
                 
-                if (importer.Activated)
+                if (importer.ActiveSplash)
                 {
                     activeSplashdown = importer;
                     break;  //only use first match

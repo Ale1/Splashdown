@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Splashdown.Editor
 {
-    public class LogoHandler
+    public class LogoHandler : IDisposable
     {
         private Sprite sprite;
         private float splashTime;
@@ -85,6 +85,11 @@ namespace Splashdown.Editor
             newArray[0] = newItem;
             Array.Copy(originalArray, 0, newArray, 1, originalArray.Length);
             return newArray;
+        }
+
+        public void Dispose()
+        {
+            sprite = null;
         }
     }
 }

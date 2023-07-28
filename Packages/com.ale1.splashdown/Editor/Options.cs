@@ -14,7 +14,7 @@ namespace Splashdown.Editor
                 ApplyDefaultValues();
         }
         
-        public static Font DefaultFont => AssetDatabase.LoadAssetAtPath<Font>("Packages/com.Ale1.splashdown/Editor/Splashdown_RobotoMono.ttf");
+        public static Font DefaultFont => AssetDatabase.LoadAssetAtPath<Font>(Constants.FontPath_Roboto);
         public static string DefaultFontGUID => AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(DefaultFont));
 
         public static Color DefaultBackground => Color.black;
@@ -67,7 +67,7 @@ namespace Splashdown.Editor
                 
                 foreach (var asset in assets)
                 {
-                    if (asset is Sprite sprite && sprite.name == "Generated")
+                    if (asset is Sprite sprite && sprite.name == Constants.GeneratedSpriteName)
                     {
                         return sprite;
                     }

@@ -1,6 +1,6 @@
 {
-    "name": "Ale.Splashdown",
-    "rootNamespace": "Ale.Splashdown",
+    "name": "Splashdown",
+    "rootNamespace": "Splashdown",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

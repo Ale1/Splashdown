@@ -1,17 +1,17 @@
 
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
-using UnityEditor.Android;
-using UnityEditor.Build;
-using UnityEditor.iOS;
 using UnityEngine;
+
+using Constants = Splashdown.Constants;
 
 namespace Splashdown.Editor
 {
     public static class SplashdownController
     {
+
+        public static IconHandler iconHandler;
 
         public static string[] FindAllSplashdownFiles()
         {
@@ -19,7 +19,7 @@ namespace Splashdown.Editor
             string[] splashdownGUIDs = AssetDatabase.FindAssets("", new[] { "Assets" }).Where(guid =>
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
-                return Path.GetExtension(path) == ".splashdown";
+                return Path.GetExtension(path) == "." + Constants.SplashdownExtension;
             }).ToArray();
 
             return splashdownGUIDs;
@@ -45,7 +45,19 @@ namespace Splashdown.Editor
             return null;
         }
         
-        public static Options LoadOptionsFromSplashdownFile(string guid)
+        public static Options GetOptionsFromFileName(string targetName)
+        {
+            var guid = FindSplashdownByName(targetName);
+            if (guid == null)
+            {
+                Debug.LogError($"Splashdown :: {targetName} not found");
+                return null;
+            }
+
+            return GetOptionsFromGUID(guid);
+        }
+        
+        public static Options GetOptionsFromGUID(string guid)
         {
             if (guid == null)
                 return null;
@@ -59,7 +71,7 @@ namespace Splashdown.Editor
             // Search for the "Options" sub-asset.
             foreach (var asset in allAssets)
             {
-                if (asset is TextAsset textAsset && textAsset.name == "Options")
+                if (asset is TextAsset textAsset && textAsset.name == Constants.GeneratedOptionsName)
                 {
                     // Found the "Options" sub-asset. Deserialize it.
                     options = JsonUtility.FromJson<Splashdown.Editor.Options>(textAsset.text);
@@ -82,11 +94,11 @@ namespace Splashdown.Editor
             var guid = FindSplashdownByName(targetName);
             if (guid == null)
             {
-                Debug.LogError($"{targetName} not found");
+                Debug.LogError($"Splashdown :: {targetName} not found");
                 return;
             }
             
-            var splashdownData = LoadOptionsFromSplashdownFile(guid);
+            var splashdownData = GetOptionsFromGUID(guid);
             if (splashdownData != null)
             {
                 var handler = new LogoHandler(splashdownData);
@@ -96,132 +108,53 @@ namespace Splashdown.Editor
         
         public static void RemoveSplash(string targetName)
         {
-            var guid = FindSplashdownByName(targetName);
-            var splashDownData = LoadOptionsFromSplashdownFile(guid);
-            var handler = new LogoHandler(splashDownData);
+            var splashdownData = GetOptionsFromFileName(targetName);
+            
+            if (splashdownData == null)
+                return;
+            var handler = new LogoHandler(splashdownData);
             handler.RemoveSplash();
         }
 
-        private static Dictionary<PlatformIconKind, PlatformIcon[]> _backupIcons;
-
-
-        public static bool SetIcons(string targetName)
+        
+        public static void SetIcons(string targetName)
         {
+            if (iconHandler != null)
+            {
+                iconHandler.RestoreIcons();
+                iconHandler.Dispose();
+                iconHandler = null;
+            }
+
             var guid = FindSplashdownByName(targetName);
             if (guid == null)
             {
                 Debug.LogError($"{targetName} not found");
-                return false;
+                return;
             }
             
-            var splashdownData = LoadOptionsFromSplashdownFile(guid);
+            var splashdownData = GetOptionsFromGUID(guid);
             if (splashdownData == null)
             {
                 Debug.LogError("could not load options");
-                return false;
+                return;
             }
-              
-
-            var sprite = splashdownData.Sprite;
             
-            var transparentBackground = AssetDatabase.LoadAssetAtPath<Texture2D>("Packages/com.ale1.splashdown/Editor/splashdown_transparent.png");  //todo: move to constants
-
-            if (sprite == null || transparentBackground == null)
-            {
-                Debug.LogError("error loading sprites");
-                return false;
-            }
-
-            NamedBuildTarget platform;
-            PlatformIconKind[] kinds;
-            if (!GetPlatform(out platform) || !FetchIconKind(out kinds))
-            {
-                return false;
-            }
-
-            //fill backup icons dictionary.  
-            _backupIcons = new Dictionary<PlatformIconKind, PlatformIcon[]>();
-            foreach (var kind in kinds)
-            {
-                var icons = PlayerSettings.GetPlatformIcons(platform, kind);
-                _backupIcons[kind] = icons;
-            }
-
-            foreach (var kind in kinds)
-            {
-                var icons = PlayerSettings.GetPlatformIcons(platform, kind);
-                //Assign textures to each available icon slot.
-                for (int i = 0; i < icons.Length; i++)
-                {
-                    var size = icons[i].maxLayerCount; // amount of textures expected
-                    var splashdownIconArray = new Texture2D[size];
-                    int index = size > 1 ? 1 : 0;
-                    splashdownIconArray[0] = transparentBackground; // background transparent by default
-                    splashdownIconArray[index] = sprite.texture; //set foreground to splashdown
-                    icons[i].SetTextures(splashdownIconArray);
-                }
-
-                PlayerSettings.SetPlatformIcons(platform, kind, icons);
-            }
-            return true;
+            iconHandler = new IconHandler(splashdownData);
+            iconHandler.SetIcons();
         }
         
-        public static bool RestoreIcons()
+        public static void RestoreIcons()
         {
-            if (_backupIcons == null)
-                return false;
-            
-            if (GetPlatform(out NamedBuildTarget platform))
+            if (iconHandler != null)
             {
-                foreach (var entry in _backupIcons)
-                {
-                    PlayerSettings.SetPlatformIcons(platform, entry.Key, entry.Value);
-                }
-
-                return true;
-            }
-
-            return false;
-        }
-
-        private static bool FetchIconKind(out PlatformIconKind[] kinds)
-        {
-            BuildTarget currentBuildTarget = EditorUserBuildSettings.activeBuildTarget;
-            switch (currentBuildTarget)
-            {
-                case BuildTarget.Android:
-                    kinds = new[]
-                    {
-                        AndroidPlatformIconKind.Adaptive, AndroidPlatformIconKind.Legacy,
-                        AndroidPlatformIconKind.Round
-                    };
-                    return true;
-                case BuildTarget.iOS:
-                    kinds = new[] { iOSPlatformIconKind.Application };
-                    return true;
-                default:
-                    Debug.LogError("unsupported platform");
-                    kinds = null;
-                    return false;
+                Debug.Log("restoring");
+                iconHandler.RestoreIcons();
+                iconHandler.Dispose();
+                iconHandler = null;
             }
         }
-
-        private static bool GetPlatform(out NamedBuildTarget platform)
-        {
-            BuildTarget currentBuildTarget = EditorUserBuildSettings.activeBuildTarget;
-            switch (currentBuildTarget)
-            {
-                case BuildTarget.Android:
-                    platform = NamedBuildTarget.Android;
-                    return true;
-                case BuildTarget.iOS:
-                    platform = NamedBuildTarget.iOS;
-                    return true;
-                default:
-                    platform = NamedBuildTarget.Unknown;
-                    Debug.LogWarning("unsupported build target");
-                    return false;
-            }
-        }
+        
+        
     }
 }

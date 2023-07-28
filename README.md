@@ -28,19 +28,21 @@ wip
 Right-click on any location within the Assets Folder.  Select `Create > New Splashdown`.   
 A Splashdown file will appear. 
 
-Fill in the Splashdown Importer window and hit `Apply`.  
+Fill in the Splashdown Importer window and hit `Apply` button.  
 
-![Screenshot 2023-07-12 at 21 06 20](https://github.com/Ale1/Splashdown/assets/4612160/c7a415bc-0d9f-4810-a977-b892e0540f37)
+![Screenshot 2023-07-28 at 12 18 28](https://github.com/Ale1/Splashdown/assets/4612160/34a23189-ec5d-4801-9b9e-aa2ede8b6833)
+
 
 Congrats! you generated your first custom Icon
 
-This file can be used as a placeholder app icon or logo in your Build Settings.
-If you are happy to just set the app icon or splash manually then you are all set!   
+
+This generated sprite can be used as a placeholder app icon or logo in your Build Settings.
+By setting hitting `Activate` button, the playerSettings will start using this sprite as its icon and splash image:
 
 
-| ![Screenshot 2023-07-12 at 22 10 42](https://github.com/Ale1/Splashdown/assets/4612160/1ec61486-ab92-432a-b274-e037de82f433) |
+|![Screenshot 2023-07-28 at 14 07 51](https://github.com/Ale1/Splashdown/assets/4612160/d371c966-d9ae-40e7-9481-9a85d9d1f5c8)|
 |:--:| 
-| *can use splashdown manually by dragging and dropping the Splashdown file in Player settings* |
+| *you can remove it by selecting "Deactive" in the splashdown editor* |
 
 
 
@@ -77,26 +79,49 @@ public static class Example
 <br/><br/>
 
 
-## (3) Add splashdown to your build pipeline through build script. 
+## (3) Add splashdown to your build pipeline 
 
-WIP.  Set option *regenerate on build* to true.  This will create a new icon as a build step and apply it to project settings.
+Any splashdown file that is set to "ACTIVE" will regenerate when unity is building. This means the latest values from dynamic options will be used, as well as adding the splash and/or logo to your Player Settings.  
+If you dont desire this behaviour, simply leave the splashdown files in "INACTIVE" state.  You are always welcome to drag-and-drop the generated sprite as needed to your player prefs if you want full manual control. 
 
 
 ## (4) Add Splashdown to your build pipeline through CLI
 
+```
+//below will activate the splashdown file with name "MySplashdown" and apply the options
+
 _yourUnityPath_ -batchmode -quit -projectPath _yourProjectPath_ -executeMethod Splashdown.Editor.CommandLineInterpreter.SetSplashOptions -name MySplashdown -l1 hello -l2 banana -l3 world
+```
 
-Note:  You can provide options through multiple avenues.  The order of priority (most to least) is: 
-(1) Dynamic Options.  
+```
+//Example for MacOs
+ /Applications/Unity/Unity.app/Contents/MacOS/Unity -quit -batchmode -projectPath ~/Desktop/Splashdown -executeMethod Splashdown.Editor.CLI.SetSplashOptions -name MySplashdown -activeSplash -l1 hello -l2 cruel -l3 world
+```
+
+optional flags:
+```
+-enableDynamic //sets dynamic options to false
+-disableDynamic //sets dynamic options to true
+```
+
+
+Note: Since you can provide options through multiple avenues, keep in mind the order of priority (most to least):
+
+(1) Dynamic Options  
+
 (2) CLI Options
-(2) Options set manually in inspector.  
-(3) Default Options
 
-If you dont wish Dynamic options to override CLI options, you may disable them by passing optional flag "-disableDynamic".  
+(2) Options set manually in inspector
+
+(3) Default Options
 
 
 
 # Advanced Customization
+## Managing multiple Splashdown files
++ WIP
+
+
 ## Switching Fonts
 + WIP
 
@@ -118,11 +143,20 @@ If you dont wish Dynamic options to override CLI options, you may disable them b
 
 
 # FAQ
-+ I want to use the generated logo for something else, how can I extract the texture/sprite from the splashdown file? (WIP)
++ **My Dynamic options are overriding the options passed through CLI!?**  
+
+You can disable the dynamic options with the optional flag provided.  You can also simply have the DynamicOptions only override a certain line (e.g line1) and leave the rest for the CLI options to fill. 
+
++ **I want to use the generated logo for something else, how can I extract the texture/sprite from the splashdown file?**
+  
+A Sprite is generated and saved as a sub-asset of the splashdown file. you can copy it to your clipboard from the project hierarchy, and paste it elsewhere in your project to get a clone.
+
 + I want to use 2 splashdown files: one for the app icon and a separate one for splash logo. How do I do that? (WIP)
-+ Can I use a transparent color background ? 
-+ Can I use asian alphabets (e.g kanji) ?   
-   Yes!  but you will likely need to provide your own font as the built-in fonts are very limited in the amount of characters available.  See instructions for switching fonts. 
++ Can I use a transparent color background ? (WIP)
+
++ **Can I use asian alphabets (e.g kanji) ?**   
+
+Yes!  but you will likely need to provide your own font as the built-in fonts are very limited in the amount of characters available.  See instructions for switching fonts. 
 
 
   

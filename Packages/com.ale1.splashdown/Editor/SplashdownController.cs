@@ -52,7 +52,7 @@ namespace Splashdown.Editor
             
             string assetPath = AssetDatabase.GUIDToAssetPath(guid);
             var name = System.IO.Path.GetFileNameWithoutExtension(assetPath);
-            Splashdown.Options options = null;
+            Splashdown.Editor.Options options = null;
 
             // Load all assets and sub-assets at the asset path.
             Object[] allAssets = AssetDatabase.LoadAllAssetsAtPath(assetPath);
@@ -63,7 +63,7 @@ namespace Splashdown.Editor
                 if (asset is TextAsset textAsset && textAsset.name == "Options")
                 {
                     // Found the "Options" sub-asset. Deserialize it.
-                    options = JsonUtility.FromJson<Splashdown.Options>(textAsset.text);
+                    options = JsonUtility.FromJson<Splashdown.Editor.Options>(textAsset.text);
                     
                     if(options == null)
                         Debug.LogError("unable to deserialize");

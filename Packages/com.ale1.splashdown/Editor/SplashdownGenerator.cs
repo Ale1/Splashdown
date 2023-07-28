@@ -29,12 +29,12 @@ namespace Splashdown.Editor
                 targetPath = Path.Combine(targetPath, DefaultFilename);
             }
 
-            var options = new Splashdown.Options(true);
+            var options = new Splashdown.Editor.Options(true);
             GenerateSplashdownFile(targetPath, options);
         }
         
         
-        public static void GenerateSplashdownFile(string targetPath, Splashdown.Options options)
+        public static void GenerateSplashdownFile(string targetPath, Splashdown.Editor.Options options)
         {
             // Apply the customizations here
             var texture = CreateTexture(targetPath, options);
@@ -51,14 +51,14 @@ namespace Splashdown.Editor
             AssetDatabase.ImportAsset(targetPath); //todo: check if this necessary?
         }
         
-        public static Texture2D CreateTexture(string targetPath, Splashdown.Options options)
+        public static Texture2D CreateTexture(string targetPath, Splashdown.Editor.Options options)
         {
             // Create a new texture
             var texture = new Texture2D(360, 360, TextureFormat.RGBA32, false);
 
             if (options == null)
             {
-                options = new Splashdown.Options(true);
+                options = new Splashdown.Editor.Options(true);
             }
             
 
@@ -118,7 +118,7 @@ namespace Splashdown.Editor
         }
 
 
-        private static void AddText(this Texture2D texture, string text, int yPosition, Splashdown.Options options)
+        private static void AddText(this Texture2D texture, string text, int yPosition, Splashdown.Editor.Options options)
         {
             //todo: use max text width instead of number of characters to decide if truncation is necessary. 
             //remarks: right now since current font is monospaced, text character count is good measure of width, but to support other fonts will need to add individual characer widths.

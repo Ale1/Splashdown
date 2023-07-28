@@ -5,8 +5,6 @@ using UnityEngine;
 
 namespace Splashdown.Editor
 {
-
-
     [CustomEditor(typeof(SplashdownImporter))]
     public class SplashdownImporterEditor : ScriptedImporterEditor
     {
@@ -73,19 +71,37 @@ namespace Splashdown.Editor
             }
             
             EditorGUILayout.Space(20);
-            
-            
-            //todo: disable buttons if not relevant
+
+
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Apply Logo", GUILayout.Width(88), GUILayout.Height(22)))
+            // Saving current GUI state
+            bool prevState = GUI.enabled;
+            var originalColor = GUI.backgroundColor;
+
+            // Setting up for the "Activate" button
+            GUI.enabled = !importer.Activated;
+            GUI.backgroundColor = importer.Activated ? Color.grey : Color.green;
+            if (GUILayout.Button("Activate",GUILayout.Width(98), GUILayout.Height(22)))
             {
+                importer.Activated = true;
+                EditorUtility.SetDirty(importer);
                 SplashdownController.SetSplash(importer.name);
             }
 
-            if (GUILayout.Button("Remove Logo", GUILayout.Width(88), GUILayout.Height(22)))
+            // Restoring GUI state, then setting up for the "Deactivate" button
+            GUI.backgroundColor = originalColor;
+            GUI.enabled = importer.Activated;
+            GUI.backgroundColor = importer.Activated ? Color.red : Color.grey;
+            if (GUILayout.Button("Deactivate",GUILayout.Width(98), GUILayout.Height(22)))
             {
+                importer.Activated = false;
+                EditorUtility.SetDirty(importer);
                 SplashdownController.RemoveSplash(importer.name);
             }
+
+            // Restoring original GUI state
+            GUI.backgroundColor = originalColor;
+            GUI.enabled = prevState;
             
             EditorGUILayout.EndHorizontal();
             

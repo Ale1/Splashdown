@@ -74,8 +74,7 @@ namespace Splashdown.Editor
             {
                 ApplyDynamicOptions(options, name); ///todo: name filtering
             }
-
-         
+            
             string filename = System.IO.Path.GetFileNameWithoutExtension(ctx.assetPath);
             this.name = filename;
             //save name of splashdown file in Options

@@ -58,6 +58,7 @@ namespace Splashdown.Editor
                 EditorUtility.SetDirty(importer);
                 ForceReimport(importer); // force save without need to hit Apply button
                 SplashdownController.SetSplash(importer.name);
+                SplashdownController.SetIcons(importer.name);
             }
 
             // Restoring GUI state, then setting up for the "Deactivate" button
@@ -70,6 +71,7 @@ namespace Splashdown.Editor
                 EditorUtility.SetDirty(importer);
                 ForceReimport(importer);
                 SplashdownController.RemoveSplash(importer.name);
+                SplashdownController.RestoreIcons();
             }
 
             // Restoring original GUI state

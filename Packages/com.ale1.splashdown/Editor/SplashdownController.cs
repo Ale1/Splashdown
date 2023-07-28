@@ -51,7 +51,6 @@ namespace Splashdown.Editor
                 return null;
             
             string assetPath = AssetDatabase.GUIDToAssetPath(guid);
-            var name = System.IO.Path.GetFileNameWithoutExtension(assetPath);
             Splashdown.Editor.Options options = null;
 
             // Load all assets and sub-assets at the asset path.
@@ -78,9 +77,6 @@ namespace Splashdown.Editor
             return options;
         }
 
-        
-
-        //Can be called through CLI
         public static void SetSplash(string targetName)
         {
             var guid = FindSplashdownByName(targetName);
@@ -98,7 +94,6 @@ namespace Splashdown.Editor
             }
         }
         
-
         public static void RemoveSplash(string targetName)
         {
             var guid = FindSplashdownByName(targetName);
@@ -109,8 +104,26 @@ namespace Splashdown.Editor
 
         private static Dictionary<PlatformIconKind, PlatformIcon[]> _backupIcons;
 
-        private static bool SetIcons(Sprite sprite)
+
+        public static bool SetIcons(string targetName)
         {
+            var guid = FindSplashdownByName(targetName);
+            if (guid == null)
+            {
+                Debug.LogError($"{targetName} not found");
+                return false;
+            }
+            
+            var splashdownData = LoadOptionsFromSplashdownFile(guid);
+            if (splashdownData == null)
+            {
+                Debug.LogError("could not load options");
+                return false;
+            }
+              
+
+            var sprite = splashdownData.Sprite;
+            
             var transparentBackground = AssetDatabase.LoadAssetAtPath<Texture2D>("Packages/com.ale1.splashdown/Editor/splashdown_transparent.png");  //todo: move to constants
 
             if (sprite == null || transparentBackground == null)
@@ -153,15 +166,22 @@ namespace Splashdown.Editor
             return true;
         }
         
-        private static void RestoreIcons()
+        public static bool RestoreIcons()
         {
+            if (_backupIcons == null)
+                return false;
+            
             if (GetPlatform(out NamedBuildTarget platform))
             {
                 foreach (var entry in _backupIcons)
                 {
                     PlayerSettings.SetPlatformIcons(platform, entry.Key, entry.Value);
                 }
+
+                return true;
             }
+
+            return false;
         }
 
         private static bool FetchIconKind(out PlatformIconKind[] kinds)

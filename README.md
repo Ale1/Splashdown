@@ -79,33 +79,47 @@ public static class Example
 <br/><br/>
 
 
-## (3) Add splashdown to your build pipeline 
+## (3) Add splashdown to your builds 
 
-Any splashdown file that is set to "ACTIVE" will regenerate when unity is building. This means the latest values from dynamic options will be used, as well as adding the splash and/or logo to your Player Settings.  
-If you dont desire this behaviour, simply leave the splashdown files in "INACTIVE" state.  You are always welcome to drag-and-drop the generated sprite as needed to your player prefs if you want full manual control. 
+
+Any splashdown file that is set to `ACTIVE` will regenerate when unity is building. 
+This means the latest values from dynamic options will be used, as well as adding the splash and/or logo to your Player Settings.  
+If you dont desire this behaviour, simply leave the splashdown files in `INACTIVE` state.  
+If you always want full manual control, simply drag-and-drop the generated sprite as needed to your Player Settings. 
 
 
 ## (4) Add Splashdown to your build pipeline through CLI
 
-```
-//below will activate the splashdown file with name "MySplashdown" and apply the options
 
+below will activate the splashdown file with the provided filename, and apply the options.  Note that "MySplashdown" is the default name of your splashdown file.
+```shell
 _yourUnityPath_ -batchmode -quit -projectPath _yourProjectPath_ -executeMethod Splashdown.Editor.CommandLineInterpreter.SetSplashOptions -name MySplashdown -l1 hello -l2 banana -l3 world
 ```
 
-```
-//Example for MacOs
- /Applications/Unity/Unity.app/Contents/MacOS/Unity -quit -batchmode -projectPath ~/Desktop/Splashdown -executeMethod Splashdown.Editor.CLI.SetSplashOptions -name MySplashdown -activeSplash -l1 hello -l2 cruel -l3 world
-```
-
 optional flags:
-```
+```shell
 -enableDynamic //sets dynamic options to false
 -disableDynamic //sets dynamic options to true
 ```
 
+Example for MacOS:
+```shell
+ /Applications/Unity/Unity.app/Contents/MacOS/Unity -quit -batchmode -projectPath ~/Desktop/MyCoolGame -executeMethod Splashdown.Editor.CLI.SetSplashOptions -name MySplashdown -activeSplash -l1 hello -l2 cruel -l3 world
+```
+Example for Windows:
+```shell
+"C:\Program Files\Unity\Editor\Unity.exe" -quit -batchmode -projectPath "C:\Users\UserName\Documents\MyProject" -executeMethod Splashdown.Editor.CLI.SetSplashOptions -name "MySplashdown" -disableDynamic -l1 "Banana"
+MyEditorScript.PerformBuild
+```
 
-Note: Since you can provide options through multiple avenues, keep in mind the order of priority (most to least):
+
+
+# Advanced Customization
+
+
+## Conflicting Options Resolution
+
+Since you can provide options through multiple avenues, keep in mind the order of priority below (most to least).  
 
 (1) Dynamic Options  
 
@@ -115,9 +129,9 @@ Note: Since you can provide options through multiple avenues, keep in mind the o
 
 (3) Default Options
 
+Options with higher Priority will override ones with lower priority. 
 
 
-# Advanced Customization
 ## Managing multiple Splashdown files
 + WIP
 
@@ -125,8 +139,10 @@ Note: Since you can provide options through multiple avenues, keep in mind the o
 ## Switching Fonts
 + WIP
 
+
 ## Customizing the Border
 + WIP
+
 
 ## using a texture as background or watermark
 + WIP
@@ -134,12 +150,12 @@ Note: Since you can provide options through multiple avenues, keep in mind the o
 
 # Supported Unity Versions
 
-| Version  | Supported         |
-| -------- | ----------------- |
-| < 2021.X | ✖️ not supported  |
-| 2021.X   | ✅ supported      |
-| 2022.X   | ❔ untested       |
-| 2023.X   | ❔ untested       |
+| Version   | Supported          |
+| --------  | ------------------ |
+| < 2021.X  | ✖️ not supported   |
+| 2021.X    | ✅ supported       |
+| 2022.X    | ❔ untested        |
+| 2023.X    | ❔ untested        |
 
 
 # FAQ

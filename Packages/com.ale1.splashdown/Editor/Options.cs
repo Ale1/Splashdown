@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 using UnityEditor;
 using UnityEngine;
 
-namespace Splashdown
+namespace Splashdown.Editor
 {
     [Serializable]
     public class Options
@@ -16,15 +16,14 @@ namespace Splashdown
         
         public static Font DefaultFont => AssetDatabase.LoadAssetAtPath<Font>("Packages/com.Ale1.splashdown/Editor/Splashdown_RobotoMono.ttf");
         public static string DefaultFontGUID => AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(DefaultFont));
+
         public static Color DefaultBackground => Color.black;
         public static Color DefaultTextColor => new Color(1f, 1f, 0.6f, 1f);
-        public static float DefaultSplashtime = 4f;
+        public static float DefaultSplashtime => 4f;
         
         [HideInInspector]
         public string fileName;
 
-        public bool? refreshOnBuild;
-        
         public SerializableColor backgroundColor;
         public SerializableColor textColor;
 

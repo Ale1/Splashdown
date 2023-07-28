@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEditor.AssetImporters;
 using System.Reflection;
+using UnityEngine.Serialization;
 
 
 namespace Splashdown.Editor
@@ -12,18 +13,20 @@ namespace Splashdown.Editor
     [ScriptedImporter(1, "splashdown")]
     public class SplashdownImporter : ScriptedImporter
     {
+        [HideInInspector] public bool Activated;
         public bool useDynamicOptions;
+        
 
         [HideInInspector] public Options inspectorOptions;
 
-        public static Splashdown.Options DeserializeOptions(string pathToSplashdown)
+        public static Splashdown.Editor.Options DeserializeOptions(string pathToSplashdown)
         {
             var assets = AssetDatabase.LoadAllAssetsAtPath(pathToSplashdown);
             foreach (var asset in assets)
             {
                 if (asset is TextAsset textAsset && textAsset.name == "Options")
                 {
-                    return JsonUtility.FromJson<Splashdown.Options>(textAsset.text);
+                    return JsonUtility.FromJson<Splashdown.Editor.Options>(textAsset.text);
                 }
             }
 
@@ -64,7 +67,8 @@ namespace Splashdown.Editor
                 options = new Options(true);
             }
             
-            options.UpdateWith(inspectorOptions);
+            if(inspectorOptions != null)
+                options.UpdateWith(inspectorOptions);
 
             if (useDynamicOptions)
             {
@@ -159,7 +163,7 @@ namespace Splashdown.Editor
                                 .FirstOrDefault() is Splashdown.OptionsProviderAttribute)
                         {
                             // check for correct implementation by reading the return type
-                            if (method.ReturnType != typeof(Splashdown.Options))
+                            if (method.ReturnType != typeof(Splashdown.Editor.Options))
                             {
                                 Debug.LogWarning(
                                     $"{method} with {nameof(Splashdown.OptionsProviderAttribute)} does not have correct return type ");
@@ -177,7 +181,7 @@ namespace Splashdown.Editor
 
                             // If we get here, the method is valid
 
-                            var dynamicOptions = (Splashdown.Options)method.Invoke(null, null);
+                            var dynamicOptions = (Splashdown.Editor.Options)method.Invoke(null, null);
 
                             options.UpdateWith(dynamicOptions);
 

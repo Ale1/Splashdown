@@ -10,10 +10,10 @@ namespace Splashdown.Editor
         private Sprite sprite;
         private float splashTime;
         
-        public LogoHandler(Splashdown.Options options)
+        public LogoHandler(Splashdown.Editor.Options options)
         {
             sprite = options.Sprite;
-            splashTime = options.SplashTime ?? 0f;
+            splashTime = options.SplashTime ?? Options.DefaultSplashtime;
         }
         
         private bool HasLogo()

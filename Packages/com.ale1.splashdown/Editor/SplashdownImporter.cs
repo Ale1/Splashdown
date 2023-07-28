@@ -13,7 +13,7 @@ using OptionsProviderAttribute = Splashdown.OptionsProviderAttribute;
 
 namespace Splashdown.Editor
 {
-    [ScriptedImporter(1, Constants.SplashdownExtension)]
+    [ScriptedImporter(1, Constants.SplashdownFileType)]
     public class SplashdownImporter : ScriptedImporter
     {
         [HideInInspector] public bool ActiveSplash;
@@ -42,7 +42,7 @@ namespace Splashdown.Editor
             // Get all '.splashdown' asset paths in the project.
             var splashdownPaths = AssetDatabase.FindAssets("", new[] { "Assets" })
                 .Select(AssetDatabase.GUIDToAssetPath)
-                .Where(path => Path.GetExtension(path) == "." + Constants.SplashdownExtension);
+                .Where(path => Path.GetExtension(path) == Constants.SplashdownExtension);
 
             foreach (var splashdownPath in splashdownPaths)
             {

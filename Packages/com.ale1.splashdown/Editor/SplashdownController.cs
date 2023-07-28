@@ -10,7 +10,6 @@ namespace Splashdown.Editor
 {
     public static class SplashdownController
     {
-
         public static IconHandler iconHandler;
 
         public static string[] FindAllSplashdownFiles()
@@ -19,7 +18,7 @@ namespace Splashdown.Editor
             string[] splashdownGUIDs = AssetDatabase.FindAssets("", new[] { "Assets" }).Where(guid =>
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
-                return Path.GetExtension(path) == "." + Constants.SplashdownExtension;
+                return Path.GetExtension(path) == Constants.SplashdownExtension;
             }).ToArray();
 
             return splashdownGUIDs;

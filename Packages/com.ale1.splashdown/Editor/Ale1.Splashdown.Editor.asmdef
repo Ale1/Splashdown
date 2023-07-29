@@ -1,6 +1,6 @@
 {
-    "name": "Ale1.Splashdown.Editor",
-    "rootNamespace": "Ale1.Splashdown.Editor",
+    "name": "Splashdown.Editor",
+    "rootNamespace": "Splashdown.Editor",
     "references": [
         "GUID:972a598a523744c2e9924727408d3bb5"
     ],

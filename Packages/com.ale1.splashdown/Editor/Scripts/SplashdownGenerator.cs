@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using UnityEditor;
@@ -7,12 +7,23 @@ namespace Splashdown.Editor
 {
     public static class SplashdownGenerator
     {
-        
-        const string DefaultFilename = "MySplashdown.splashdown"; 
+        private const string DefaultFilename = "MySplashdown";
+        const string DefaultFilenameWithExtension = DefaultFilename + Constants.SplashdownExtension; 
         
         [MenuItem("Assets/Create/New Splashdown")]
         public static void CreateNewSplashdownFromContextMenu()
         {
+            var counter = 0;
+            
+            //check if default filename is safe to use
+            var filename = DefaultFilename;
+
+            while (SplashdownExists(filename))
+            {
+                counter++;
+                filename = DefaultFilename + "_" + counter;
+            }
+            
             var targetPath = (AssetDatabase.GetAssetPath(Selection.activeObject));
             
             if (string.IsNullOrEmpty(targetPath))
@@ -21,36 +32,18 @@ namespace Splashdown.Editor
             }
             else if (Directory.Exists(targetPath)) // its a directory.
             {
-                targetPath = Path.Combine(targetPath, DefaultFilename);
+                targetPath = Path.Combine(targetPath, filename +Constants.SplashdownExtension);
             }
             else if (Path.GetExtension(targetPath) != "") //path is pointing to a file.  Use same location but use default filename.
             {
                 targetPath = targetPath.Replace(Path.GetFileName(AssetDatabase.GetAssetPath(Selection.activeObject)), "");
-                targetPath = Path.Combine(targetPath, DefaultFilename);
+                targetPath = Path.Combine(targetPath, filename+Constants.SplashdownExtension);
             }
 
             var options = new Splashdown.Editor.Options(true);
             GenerateSplashdownFile(targetPath, options);
         }
-        
-        
-        public static void GenerateSplashdownFile(string targetPath, Splashdown.Editor.Options options)
-        {
-            // Apply the customizations here
-            var texture = CreateTexture(targetPath, options);
-            
-            byte[] bytes = texture.EncodeToPNG();
-            string fullPath =  targetPath.Replace("Assets", Application.dataPath);
-            File.WriteAllBytes(fullPath, bytes);
-            AssetDatabase.Refresh();
 
-            // Reimport asset as Splashdown
-            SplashdownImporter importer = (SplashdownImporter)AssetImporter.GetAtPath(targetPath);
-            EditorUtility.SetDirty(importer);
-            importer.SaveAndReimport();
-            AssetDatabase.ImportAsset(targetPath); //todo: check if this necessary?
-        }
-        
         public static Texture2D CreateTexture(string targetPath, Splashdown.Editor.Options options)
         {
             // Create a new texture
@@ -116,8 +109,7 @@ namespace Splashdown.Editor
 
             return texture;
         }
-
-
+        
         private static void AddText(this Texture2D texture, string text, int yPosition, Splashdown.Editor.Options options)
         {
             //todo: use max text width instead of number of characters to decide if truncation is necessary. 
@@ -128,7 +120,7 @@ namespace Splashdown.Editor
                 Debug.LogWarning($"Splashdown ::: text is too long to fit, will be truncated: '{text}...'");
             }
             
-            var font = options.font;
+            var font = options.Font;
             if (font == null)
             {
                 font = Options.DefaultFont;
@@ -195,7 +187,7 @@ namespace Splashdown.Editor
             RenderTexture.active = null;
             RenderTexture.ReleaseTemporary(rt);
         }
-
+        
 
         private static int GetTextWidth(string text, Font font)
         {
@@ -267,6 +259,45 @@ namespace Splashdown.Editor
 
             // Apply the changes
             texture.Apply();
+        }
+        
+        private static void GenerateSplashdownFile(string targetPath, Splashdown.Editor.Options options)
+        {
+            // Apply the customizations here
+            var texture = CreateTexture(targetPath, options);
+            
+            byte[] bytes = texture.EncodeToPNG();
+            string fullPath =  targetPath.Replace("Assets", Application.dataPath);
+            File.WriteAllBytes(fullPath, bytes);
+            AssetDatabase.Refresh();
+
+            // Reimport asset as Splashdown
+            SplashdownImporter importer = (SplashdownImporter)AssetImporter.GetAtPath(targetPath);
+            EditorUtility.SetDirty(importer);
+            importer.SaveAndReimport();
+            AssetDatabase.ImportAsset(targetPath); //todo: check if this necessary?
+        }
+
+        
+        /// <summary>
+        /// Check if file with the same name (including extension .splashdown) already exists. 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        private static bool SplashdownExists(string name)
+        {
+            string[] files = Directory.GetFiles(Application.dataPath, $"*{Constants.SplashdownExtension}", SearchOption.AllDirectories);
+            
+            foreach (string file in files)
+            {
+                string filename = Path.GetFileName(file);
+                if (Path.GetFileNameWithoutExtension(filename).Equals(name))
+                {
+                    return true;
+                }
+            }
+            
+            return false;
         }
     }
 }

@@ -7,8 +7,7 @@ public static class Example
         public static Splashdown.Editor.Options ProvideSplashdownOptions() => new()
         {
                 line1 = "Hello",
-                line2 = "Cruel",
-                line3 = "World",
+                line2 = "Handsome",
                 textColor = Color.red
         };
         

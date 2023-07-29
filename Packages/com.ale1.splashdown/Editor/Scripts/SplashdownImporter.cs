@@ -22,7 +22,9 @@ namespace Splashdown.Editor
         
 
         [HideInInspector] public Options inspectorOptions;
-
+        
+        public string GetGuid => AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(this));
+        
         public static Splashdown.Editor.Options DeserializeOptions(string pathToSplashdown)
         {
             var assets = AssetDatabase.LoadAllAssetsAtPath(pathToSplashdown);

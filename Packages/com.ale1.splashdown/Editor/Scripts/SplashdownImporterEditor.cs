@@ -10,6 +10,7 @@ namespace Splashdown.Editor
     {
         private Options options;
 
+        
         public override void OnInspectorGUI()
         {
             var importer = (SplashdownImporter)target;
@@ -26,9 +27,12 @@ namespace Splashdown.Editor
             var originalColor = GUI.backgroundColor;
             
             EditorGUILayout.Space(10);
-            EditorGUILayout.LabelField("STATUS", centered, GUILayout.Width(268));
+            EditorGUILayout.LabelField("STATUS", centered, GUILayout.Width(274));
             
             EditorGUILayout.BeginHorizontal();
+            
+            // Draw vertical line
+            GUILayout.Box("", new GUILayoutOption[]{GUILayout.ExpandHeight(true), GUILayout.Width(2)});
             EditorGUILayout.BeginVertical(GUILayout.Width(134));
 
             DrawSplashActivationButtons(importer, originalColor);
@@ -37,6 +41,9 @@ namespace Splashdown.Editor
             GUI.enabled = prevState;
             
             EditorGUILayout.EndVertical();
+            
+            // Draw vertical line
+            GUILayout.Box("", new GUILayoutOption[]{GUILayout.ExpandHeight(true), GUILayout.Width(2)});
 
             EditorGUILayout.BeginVertical(GUILayout.Width(134));
 
@@ -44,7 +51,13 @@ namespace Splashdown.Editor
             GUI.enabled = prevState;
 
             EditorGUILayout.EndVertical();
+            
+            // Draw vertical line
+            GUILayout.Box("", new GUILayoutOption[]{GUILayout.ExpandHeight(true), GUILayout.Width(2)});
+            
             EditorGUILayout.EndHorizontal();
+       
+            
 
             EditorGUILayout.Space(30);
             DrawDefaultInspectorWithoutScript();
@@ -139,7 +152,7 @@ namespace Splashdown.Editor
         {
             Color defaultColor = GUI.color;
             GUI.color = importer.ActiveSplash ? Color.green : Color.red;
-            GUILayout.Label(importer.ActiveSplash ? "ACTIVE SPLASH" : "INACTIVE SPLASH", new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleLeft });
+            GUILayout.Label(importer.ActiveSplash ? " ACTIVE SPLASH " : "INACTIVE SPLASH", new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter });
             GUI.color = defaultColor;  // Reset color back to default
 
             EditorGUILayout.Space(10);
@@ -154,7 +167,7 @@ namespace Splashdown.Editor
                 importer.ActiveSplash = true;
                 EditorUtility.SetDirty(importer);
                 ForceReimport(importer); // force save without need to hit Apply button
-                SplashdownController.SetSplash(importer.name); //set splash right-away 
+                SplashdownController.SetSplash(importer.GetGuid); //set splash right-away 
             }
 
             // Restoring GUI state, then setting up for the "Deactivate" button
@@ -166,7 +179,7 @@ namespace Splashdown.Editor
                 importer.ActiveSplash = false;
                 EditorUtility.SetDirty(importer);
                 ForceReimport(importer);
-                SplashdownController.RemoveSplash(importer.name);
+                SplashdownController.RemoveSplash(importer.GetGuid);
             }
             GUI.backgroundColor = originalColor;
         }
@@ -175,7 +188,7 @@ namespace Splashdown.Editor
         {
             Color defaultColor = GUI.color;
             GUI.color = importer.ActiveIcon ? Color.green : Color.red;
-            GUILayout.Label(importer.ActiveIcon ? "ACTIVE ICON" : "INACTIVE ICON", new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleLeft});
+            GUILayout.Label(importer.ActiveIcon ? "  ACTIVE ICON  " : " INACTIVE ICON ", new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter});
             GUI.color = defaultColor;      // Reset color back to default
                 
             EditorGUILayout.Space(10);

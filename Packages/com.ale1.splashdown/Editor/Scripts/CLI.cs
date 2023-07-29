@@ -12,8 +12,7 @@ namespace Splashdown.Editor
         {
             
         }
-
-        [MenuItem("Splashdown/test")]
+        
         public static void SetSplashOptions()
         {
 
@@ -55,17 +54,17 @@ namespace Splashdown.Editor
                 line3 = l3,
             };
 
-            var guid = SplashdownController.FindSplashdownByName(name);
+            var guid = SplashdownUtils.GetGuidBySplashdownName(name);
+            var opts = SplashdownUtils.GetOptionsFromGuid(guid);
             
-            var splashdownData = SplashdownController.GetOptionsFromGUID(guid);
-            
-            if (splashdownData == null)
+            if (opts == null)
             {
                 Debug.LogError($"Splashdown :: no splashdown file found with name {name}");
                 return;
             }
-            
-            var importer = AssetImporter.GetAtPath(AssetDatabase.GUIDToAssetPath(guid)) as SplashdownImporter;
+
+            var assetPath = AssetDatabase.GUIDToAssetPath(guid);
+            var importer = AssetImporter.GetAtPath(assetPath) as SplashdownImporter;
             if (importer == null)
             {
                 Debug.LogError("Splashdown :: no importer found ");
@@ -87,15 +86,12 @@ namespace Splashdown.Editor
                 importer.ActiveIcon = (bool) useIcon;
             }
             
-            splashdownData.UpdateWith(newOpts);
+            opts.UpdateWith(newOpts);
             importer.SaveAndReimport();
             
-            var key =  Constants.EditorPrefsKey + "." + name; 
-            var value = JsonUtility.ToJson(splashdownData);
-            EditorPrefs.SetString(key, value);
-            
-         
-            string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+            var key =  Constants.EditorPrefsKey + "." + name;
+            SplashdownUtils.SaveOptionsToEditorPrefs(key, opts);
+                
             AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceSynchronousImport);
         }
     }

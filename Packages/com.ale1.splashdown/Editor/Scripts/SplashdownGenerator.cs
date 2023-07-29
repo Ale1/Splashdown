@@ -120,7 +120,7 @@ namespace Splashdown.Editor
                 Debug.LogWarning($"Splashdown ::: text is too long to fit, will be truncated: '{text}...'");
             }
             
-            var font = options.font;
+            var font = options.Font;
             if (font == null)
             {
                 font = Options.DefaultFont;

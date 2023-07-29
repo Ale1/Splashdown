@@ -76,14 +76,14 @@ namespace Splashdown.Editor
                 importer.useDynamicOptions = (bool) useDynamic;
             }
 
-            if (useSplash != null && importer.ActiveSplash != useSplash)
+            if (useSplash != null && importer.IsSplashActive != useSplash)
             {
-                importer.ActiveSplash = (bool) useSplash;
+                importer.SetActiveSplash( (bool) useSplash);
             }
 
-            if (importer != null && importer.ActiveIcon != useIcon)
+            if (importer != null && importer.IsIconActive != useIcon)
             {
-                importer.ActiveIcon = (bool) useIcon;
+                importer.SetActiveIconWithEvent( (bool) useIcon);
             }
             
             opts.UpdateWith(newOpts);

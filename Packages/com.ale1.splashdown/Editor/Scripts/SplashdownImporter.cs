@@ -16,15 +16,49 @@ namespace Splashdown.Editor
     [ScriptedImporter(1, Constants.SplashdownFileType)]
     public class SplashdownImporter : ScriptedImporter
     {
-        [HideInInspector] public bool ActiveSplash;
-        [HideInInspector] public bool ActiveIcon;
+        [HideInInspector][SerializeField] protected bool ActiveSplash;
+        [HideInInspector][SerializeField] protected bool ActiveIcon;
+        public bool IsSplashActive => ActiveSplash;
+        public bool IsIconActive => ActiveIcon;
+
+        
         public bool useDynamicOptions;
         
-
         [HideInInspector] public Options inspectorOptions;
+        
+        public SplashdownImporter()
+        {
+            SplashdownEvents.OnIconStateActivated -= IconStateListener;
+            SplashdownEvents.OnIconStateActivated += IconStateListener;
+        }
+
+        ~SplashdownImporter()  // Destructor
+        {
+            SplashdownEvents.OnIconStateActivated -= IconStateListener;
+        }
+
+        public void SetActiveSplash(bool val)
+        {
+            ActiveSplash = val;
+        }
+
+        public void SetActiveIconWithEvent(bool val)
+        {
+            if (ActiveIcon != val)
+            {
+                ActiveIcon = val;
+                if(ActiveIcon) SplashdownEvents.OnIconStateActivated.Invoke(this);
+            }
+        }
         
         public string GetGuid => AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(this));
         
+        
+        /// <summary>
+        /// Deserializes options for a splashdown asset from the asset database.
+        /// </summary>
+        /// <param name="pathToSplashdown">The path to the splashdown asset.</param>
+        /// <returns>Returns the deserialized options, or null if they do not exist.</returns>
         public static Splashdown.Editor.Options DeserializeOptions(string pathToSplashdown)
         {
             var assets = AssetDatabase.LoadAllAssetsAtPath(pathToSplashdown);
@@ -35,10 +69,12 @@ namespace Splashdown.Editor
                     return JsonUtility.FromJson<Splashdown.Editor.Options>(textAsset.text);
                 }
             }
-
             return null;
         }
 
+        /// <summary>
+        /// Forces all splashdown importers to update.
+        /// </summary>
         public static void RefreshAllImporters()
         {
             // Get all '.splashdown' asset paths in the project.
@@ -52,7 +88,12 @@ namespace Splashdown.Editor
                 AssetDatabase.ImportAsset(splashdownPath, ImportAssetOptions.ForceUpdate);
             }
         }
+        
 
+        /// <summary>
+        /// The main import function that is called when a '.splashdown' file is imported.
+        /// </summary>
+        /// <param name="ctx">The asset import context.</param>
         public override void OnImportAsset(AssetImportContext ctx)
         {
             ImportWithContext(ctx);
@@ -103,15 +144,12 @@ namespace Splashdown.Editor
                     EditorPrefs.DeleteKey(key);
                 };
             }
-            
 
             Font font = null;
             if (!String.IsNullOrEmpty(options.fontGUID))
             {
-                font = AssetDatabase.LoadAssetAtPath<Font>(
-                    AssetDatabase.GUIDToAssetPath(options.fontGUID));
+                font = options.Font;
             }
-
 
             if (font == null) Debug.LogError("Splashdown :: no font found");
 
@@ -142,6 +180,18 @@ namespace Splashdown.Editor
             ctx.SetMainObject(texture);
         }
 
+        /// <summary>
+        /// Listens to the icon state activation event. If the event is fired by another importer, it deactivates its own icon state.
+        /// </summary>
+        /// <param name="emiter">The importer that emitted the event.</param>
+        private void IconStateListener(AssetImporter emiter)
+        {
+            if (ActiveIcon == true && emiter != this)
+            {
+                ActiveIcon = false;
+            }
+        }
+        
 
         /// <summary>
         /// Fetches dynamic Splashdown options by searching all assemblies for a method marked with the Splashdown.OptionsProviderAttribute that has the correct signature.

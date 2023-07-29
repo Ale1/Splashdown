@@ -435,32 +435,27 @@ PlayerSettings:
       m_Height: 1024
       m_Kind: 4
       m_SubKind: App Store
-    - m_Textures:
-      - {fileID: -4172180828348410769, guid: 54fc8330db32b4b1eb73f4d37bd07b8a, type: 3}
+    - m_Textures: []
       m_Width: 180
       m_Height: 180
       m_Kind: 0
       m_SubKind: iPhone
-    - m_Textures:
-      - {fileID: -4172180828348410769, guid: 54fc8330db32b4b1eb73f4d37bd07b8a, type: 3}
+    - m_Textures: []
       m_Width: 120
       m_Height: 120
       m_Kind: 0
       m_SubKind: iPhone
-    - m_Textures:
-      - {fileID: -4172180828348410769, guid: 54fc8330db32b4b1eb73f4d37bd07b8a, type: 3}
+    - m_Textures: []
       m_Width: 167
       m_Height: 167
       m_Kind: 0
       m_SubKind: iPad
-    - m_Textures:
-      - {fileID: -4172180828348410769, guid: 54fc8330db32b4b1eb73f4d37bd07b8a, type: 3}
+    - m_Textures: []
       m_Width: 152
       m_Height: 152
       m_Kind: 0
       m_SubKind: iPad
-    - m_Textures:
-      - {fileID: -4172180828348410769, guid: 54fc8330db32b4b1eb73f4d37bd07b8a, type: 3}
+    - m_Textures: []
       m_Width: 76
       m_Height: 76
       m_Kind: 0

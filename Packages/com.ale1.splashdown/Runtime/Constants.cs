@@ -1,5 +1,7 @@
 
 
+using UnityEngine;
+
 namespace Splashdown
 {
     public static class Constants
@@ -12,5 +14,7 @@ namespace Splashdown
         public const string GeneratedOptionsName = "Options";
         public const string SplashdownFileType = "splashdown";
         public const string SplashdownExtension = "."+ SplashdownFileType;
+        public static Color DefaultBackgroundColor = Color.black;
+        public static Color DefaultTextColor = new (1f, 1f, 0.6f, 1f);
     }
 }

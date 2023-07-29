@@ -9,7 +9,6 @@ namespace Splashdown.Editor
     public class SplashdownImporterEditor : ScriptedImporterEditor
     {
         private Options options;
-
         
         public override void OnInspectorGUI()
         {
@@ -27,34 +26,27 @@ namespace Splashdown.Editor
             var originalColor = GUI.backgroundColor;
             
             EditorGUILayout.Space(10);
-            EditorGUILayout.LabelField("STATUS", centered, GUILayout.Width(274));
-            
+            EditorGUILayout.LabelField("STATUS", centered, GUILayout.Width(286));
+
             EditorGUILayout.BeginHorizontal();
             
-            // Draw vertical line
-            GUILayout.Box("", new GUILayoutOption[]{GUILayout.ExpandHeight(true), GUILayout.Width(2)});
+            DrawLine();
+            
             EditorGUILayout.BeginVertical(GUILayout.Width(134));
-
             DrawSplashActivationButtons(importer, originalColor);
-
             // Restoring original GUI state
             GUI.enabled = prevState;
-            
             EditorGUILayout.EndVertical();
             
-            // Draw vertical line
-            GUILayout.Box("", new GUILayoutOption[]{GUILayout.ExpandHeight(true), GUILayout.Width(2)});
+            DrawLine();
 
             EditorGUILayout.BeginVertical(GUILayout.Width(134));
-
             DrawIconActivationButtons(importer, originalColor);
             GUI.enabled = prevState;
-
             EditorGUILayout.EndVertical();
             
-            // Draw vertical line
-            GUILayout.Box("", new GUILayoutOption[]{GUILayout.ExpandHeight(true), GUILayout.Width(2)});
-            
+            DrawLine();
+
             EditorGUILayout.EndHorizontal();
        
             
@@ -151,8 +143,8 @@ namespace Splashdown.Editor
         private void DrawSplashActivationButtons(SplashdownImporter importer, Color originalColor)
         {
             Color defaultColor = GUI.color;
-            GUI.color = importer.ActiveSplash ? Color.green : Color.red;
-            GUILayout.Label(importer.ActiveSplash ? " ACTIVE SPLASH " : "INACTIVE SPLASH", new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter });
+            GUI.color = importer.IsSplashActive ? Color.green : Color.red;
+            GUILayout.Label(importer.IsSplashActive ? " ACTIVE SPLASH " : "INACTIVE SPLASH", new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter });
             GUI.color = defaultColor;  // Reset color back to default
 
             EditorGUILayout.Space(10);
@@ -160,26 +152,34 @@ namespace Splashdown.Editor
             Color splashButtonColor = EditorGUIUtility.isProSkin ? Color.cyan : Color.blue;
                 
             // Setting up for the "Activate Splash" button
-            GUI.enabled = !importer.ActiveSplash;
-            GUI.backgroundColor = importer.ActiveSplash ? Color.grey : splashButtonColor;
+            GUI.enabled = !importer.IsSplashActive;
+            GUI.backgroundColor = importer.IsSplashActive ? Color.grey : splashButtonColor;
             if (GUILayout.Button("Activate Splash",GUILayout.Width(122), GUILayout.Height(32)))
             {
-                importer.ActiveSplash = true;
+                importer.SetActiveSplash(true);
                 EditorUtility.SetDirty(importer);
-                ForceReimport(importer); // force save without need to hit Apply button
-                SplashdownController.SetSplash(importer.GetGuid); //set splash right-away 
+                
+                // Defer the reimport action until the next frame
+                EditorApplication.delayCall += () =>
+                {
+                    ForceReimport(importer); // force save without need to hit Apply button
+                    SplashdownController.SetSplash(importer.GetGuid);
+                };
             }
 
             // Restoring GUI state, then setting up for the "Deactivate" button
             GUI.backgroundColor = originalColor;
-            GUI.enabled = importer.ActiveSplash;
-            GUI.backgroundColor = importer.ActiveSplash ? splashButtonColor : Color.grey;
+            GUI.enabled = importer.IsSplashActive;
+            GUI.backgroundColor = importer.IsSplashActive ? splashButtonColor : Color.grey;
             if (GUILayout.Button("Deactivate Splash",GUILayout.Width(122), GUILayout.Height(32)))
             {
-                importer.ActiveSplash = false;
+                importer.SetActiveSplash(false);
                 EditorUtility.SetDirty(importer);
-                ForceReimport(importer);
-                SplashdownController.RemoveSplash(importer.GetGuid);
+                EditorApplication.delayCall += () =>
+                {
+                    ForceReimport(importer);
+                    SplashdownController.RemoveSplash(importer.GetGuid);
+                };
             }
             GUI.backgroundColor = originalColor;
         }
@@ -187,8 +187,8 @@ namespace Splashdown.Editor
         private void DrawIconActivationButtons(SplashdownImporter importer, Color originalColor)
         {
             Color defaultColor = GUI.color;
-            GUI.color = importer.ActiveIcon ? Color.green : Color.red;
-            GUILayout.Label(importer.ActiveIcon ? "  ACTIVE ICON  " : " INACTIVE ICON ", new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter});
+            GUI.color = importer.IsIconActive ? Color.green : Color.red;
+            GUILayout.Label(importer.IsIconActive ? "  ACTIVE ICON  " : " INACTIVE ICON ", new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter});
             GUI.color = defaultColor;      // Reset color back to default
                 
             EditorGUILayout.Space(10);
@@ -197,28 +197,40 @@ namespace Splashdown.Editor
 
             // Setup for the "Activate Icon" button
             GUI.backgroundColor = originalColor;
-            GUI.enabled = !importer.ActiveIcon;
-            GUI.backgroundColor = importer.ActiveIcon ? Color.grey : IconButtonColor;
+            GUI.enabled = !importer.IsIconActive;
+            GUI.backgroundColor = importer.IsIconActive ? Color.grey : IconButtonColor;
             if (GUILayout.Button("Activate Icon",GUILayout.Width(122), GUILayout.Height(32)))
             {
-                importer.ActiveIcon = true;
+                importer.SetActiveIconWithEvent(true);
                 EditorUtility.SetDirty(importer);
-                ForceReimport(importer); // force save without need to hit Apply button
+                EditorApplication.delayCall += () =>
+                {
+                    ForceReimport(importer); // force save without need to hit Apply button
+                };
             }
 
             // Restoring GUI state, then setting up for the "Deactivate" button
             GUI.backgroundColor = originalColor;
-            GUI.enabled = importer.ActiveIcon;
-            GUI.backgroundColor = importer.ActiveIcon ? IconButtonColor : Color.grey;
+            GUI.enabled = importer.IsIconActive;
+            GUI.backgroundColor = importer.IsIconActive ? IconButtonColor : Color.grey;
             if (GUILayout.Button("Deactivate Icon",GUILayout.Width(122), GUILayout.Height(32)))
             {
-                importer.ActiveIcon = false;
+                importer.SetActiveIconWithEvent(false);
                 EditorUtility.SetDirty(importer);
-                ForceReimport(importer);
+                EditorApplication.delayCall += () =>
+                {
+                    ForceReimport(importer);
+                };
             }
             // Restoring original GUI state
             GUI.backgroundColor = originalColor;
         }
 
+        private void DrawLine()
+        {
+            var rect = EditorGUILayout.GetControlRect(GUILayout.Height(108), GUILayout.Width(6));
+            rect.width = 3;
+            EditorGUI.DrawRect(rect, Color.gray);
+        }
     }
 }

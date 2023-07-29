@@ -16,9 +16,7 @@ namespace Splashdown.Editor
         
         public static Font DefaultFont => AssetDatabase.LoadAssetAtPath<Font>(Constants.FontPath_Roboto);
         public static string DefaultFontGUID => AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(DefaultFont));
-
-        public static Color DefaultBackground => Color.black;
-        public static Color DefaultTextColor => new Color(1f, 1f, 0.6f, 1f);
+        
         public static float DefaultSplashtime => 4f;
         
         [HideInInspector]
@@ -36,15 +34,15 @@ namespace Splashdown.Editor
         
         public int LineCount => (line1 != null ? 1 : 0) + (line2 != null ? 1 : 0) + (line3 != null ? 1 : 0);
         
-        public static int PreBuildCallbackOrder => 9999;
-        public const int PostbuildCallbackOrder = 1;
-        
-    
         [HideInInspector] [CanBeNull] public string fontGUID = null;
         
+        /// <summary>
+        /// Used as a temporary cache to load custom fonts dropped in the inspect, and then set to null.  
+        /// </summary>
+        /// <remarks>use the <see cref="Font"/> Property to actually fetch the font</remarks>
         [HideInInspector] public Font fontAsset;
 
-        public Font font
+        public Font Font
         {
             get
             {
@@ -95,10 +93,10 @@ namespace Splashdown.Editor
             }
             
             if (!backgroundColor.hasValue)
-                backgroundColor = DefaultBackground;
+                backgroundColor = Constants.DefaultBackgroundColor;
 
             if (!textColor.hasValue)
-                textColor = DefaultTextColor;
+                textColor = Constants.DefaultTextColor;
 
             if (SplashTime == null)
                 SplashTime = DefaultSplashtime;

@@ -34,14 +34,14 @@ namespace Splashdown.Editor
                 }
 
                 _activeSplashes = importers
-                    .Where(x => x.ActiveSplash)
+                    .Where(x => x.IsSplashActive)
                     .Select(x=> x.GetGuid)
                     .ToList();
                 
                 _activeSplashes.ForEach(SplashdownController.SetSplash);
                
                 _activeIcon = importers
-                    .Where(x => x.ActiveIcon)
+                    .Where(x => x.IsIconActive)
                     .Select(x=> x.GetGuid)
                     .FirstOrDefault();
 

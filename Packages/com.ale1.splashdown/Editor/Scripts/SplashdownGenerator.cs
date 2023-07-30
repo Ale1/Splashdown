@@ -127,8 +127,8 @@ namespace Splashdown.Editor
             }
             var fontSize = font.fontSize;
 
-            // Start text with 5% margin from the left
-            int startPosition = Mathf.FloorToInt(texture.width * 0.05f);
+            // Start text with 8% margin from the left
+            int startPosition = Mathf.FloorToInt(texture.width * 0.08f);
 
             // Let's make the texture's height equal to the font's size plus some extra 
             RenderTexture rt = RenderTexture.GetTemporary(texture.width, (int)(fontSize * 1.1f));
@@ -152,14 +152,12 @@ namespace Splashdown.Editor
             GL.Begin(GL.QUADS);
             font.RequestCharactersInTexture(text, fontSize);
             
-            Vector3 position = new Vector3(startPosition, font.ascent - fontSize * 0.26f, 0);
-
+            
             for (int i = 0; i < text.Length; i++)
             {
                 if (font.GetCharacterInfo(text[i], out CharacterInfo ch, fontSize))
                 {
-                    // Adjust x position for next character
-                    position.x += ch.advance;
+                    Vector3 position = new Vector3(startPosition, fontSize, 0);
 
                     // Vertices are defined counter-clockwise
                     GL.TexCoord(ch.uvTopLeft);
@@ -170,6 +168,9 @@ namespace Splashdown.Editor
                     GL.Vertex3(position.x + ch.maxX, position.y - ch.minY, 0);
                     GL.TexCoord(ch.uvTopRight);
                     GL.Vertex3(position.x + ch.maxX, position.y - ch.maxY, 0);
+
+                    // Adjust x position for next character
+                    startPosition += ch.advance;
                 }
             }
 

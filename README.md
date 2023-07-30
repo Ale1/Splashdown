@@ -1,10 +1,11 @@
 
-# 🟥 NOTICE 🟥
-This is WIP and version 1.0.0 will be released soon on OpenNPM! (Expected July 31 - 2023)
+## 🟥 NOTICE 🟥
+_This is WIP and version 1.0.0 will be released soon on OpenNPM! (Expected July 31 - 2023)_
 
-〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️
 
-![SplashdownLogo](https://github.com/Ale1/Splashdown/assets/4612160/37fe6e8a-52dc-44cd-ae0a-321c54c53c1b)
+![253230074-37fe6e8a-52dc-44cd-ae0a-321c54c53c1b](https://github.com/Ale1/Splashdown/assets/4612160/530b18c7-23b7-4bf4-b30b-5318b9c4bd62)
+
+
 
 A Unity open-source splash and icon tool that will generate custom icons with user-provided text.  Allows for dynamic scripted content and to be incorporated into your build pipeline. 
 

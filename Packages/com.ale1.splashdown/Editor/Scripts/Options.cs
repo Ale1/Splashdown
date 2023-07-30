@@ -16,9 +16,10 @@ namespace Splashdown.Editor
         
         public static Font DefaultFont => AssetDatabase.LoadAssetAtPath<Font>(Constants.FontPath_Roboto);
         public static string DefaultFontGUID => AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(DefaultFont));
+        public static int DefaultFontSize => DefaultFont.fontSize;
         
-        public static float DefaultSplashtime => 4f;
-        
+        public static int DefaultSplashtime => 4;
+
         [HideInInspector]
         public string fileName;
 
@@ -30,10 +31,12 @@ namespace Splashdown.Editor
         [CanBeNull] public string line3 = null;
         
 
-        public float? SplashTime; 
+        public SerializableInt SplashTime; 
         
         public int LineCount => (line1 != null ? 1 : 0) + (line2 != null ? 1 : 0) + (line3 != null ? 1 : 0);
         
+        
+        [CanBeNull] public SerializableInt TargetFontSize;
         [HideInInspector] [CanBeNull] public string fontGUID = null;
         
         /// <summary>
@@ -82,15 +85,14 @@ namespace Splashdown.Editor
             line3 = other.line3 ?? line3;
             backgroundColor = other.backgroundColor.hasValue ? other.backgroundColor : backgroundColor;
             textColor = other.textColor.hasValue ? other.textColor : textColor;
-            SplashTime = other.SplashTime ?? SplashTime;
+            SplashTime = other.SplashTime.hasValue ? other.SplashTime : SplashTime;
+            fontGUID = other.fontGUID ?? fontGUID;
+            TargetFontSize = other.TargetFontSize.hasValue ? other.TargetFontSize : TargetFontSize;
         }
         
         public void ApplyDefaultValues()
         {
-            if (fontGUID == null)
-            {
-                fontGUID = DefaultFontGUID;
-            }
+            fontGUID ??= DefaultFontGUID;
             
             if (!backgroundColor.hasValue)
                 backgroundColor = Constants.DefaultBackgroundColor;
@@ -98,8 +100,11 @@ namespace Splashdown.Editor
             if (!textColor.hasValue)
                 textColor = Constants.DefaultTextColor;
 
-            if (SplashTime == null)
+            if (!SplashTime.hasValue)
                 SplashTime = DefaultSplashtime;
+
+            if (!TargetFontSize.hasValue)
+                TargetFontSize = DefaultFontSize;
         }
     }
     
@@ -128,6 +133,42 @@ namespace Splashdown.Editor
         public static implicit operator Color?(SerializableColor serializableColor)
         {
             return serializableColor.ToColor();
+        }
+    }
+    
+    [Serializable]
+    public struct SerializableInt
+    {
+        public int value;
+        public bool hasValue;
+
+        public SerializableInt(int value)
+        {
+            this.value = value;
+            this.hasValue = true;
+        }
+
+        public int ToInt()
+        {
+            if (hasValue)
+            {
+                return Mathf.Clamp((int)value, Constants.MinFontSize, Constants.MaxFontSize);
+            }
+            else
+            {
+                Debug.LogError("Splashdown: fontSize is null");
+                return Constants.MaxFontSize;
+            }
+        }
+
+        public static implicit operator SerializableInt(int value)
+        {
+            return new SerializableInt(value);
+        }
+
+        public static implicit operator int?(SerializableInt serializableInt)
+        {
+            return serializableInt.ToInt();
         }
     }
 }

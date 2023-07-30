@@ -13,7 +13,7 @@ namespace Splashdown.Editor
         public LogoHandler(Splashdown.Editor.Options options)
         {
             sprite = options.Sprite;
-            splashTime = options.SplashTime ?? Options.DefaultSplashtime;
+            splashTime = options.SplashTime.hasValue ? (int) options.SplashTime.ToInt() : Options.DefaultSplashtime;
         }
         
         private bool HasLogo()

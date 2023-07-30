@@ -145,14 +145,6 @@ namespace Splashdown.Editor
                 };
             }
 
-            Font font = null;
-            if (!String.IsNullOrEmpty(options.fontGUID))
-            {
-                font = options.Font;
-            }
-
-            if (font == null) Debug.LogError("Splashdown :: no font found");
-
             SplashdownGenerator.CreateTexture(ctx.assetPath, options);
 
             // Load the file as bytes

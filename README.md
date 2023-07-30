@@ -36,7 +36,7 @@ Fill in the Splashdown Importer window and hit `Apply` button.
 
 Congrats! you generated your first custom Logo/Icon
 
-### Using it as Splash Logo
+### (2) Using it as Splash Logo
 This generated sprite can be used as a logo in your Player Settings.
 By setting hitting `Activate Splash` button, the playerSettings will start using this sprite as its splash image:
 
@@ -44,17 +44,16 @@ By setting hitting `Activate Splash` button, the playerSettings will start using
 |:--:| 
 | *you can remove it by selecting "Deactive" in the splashdown editor* |
 
-### Using it as App Icon
+### (3) Using it as App Icon
 The same generated sprite can be used as an app icon when you build.  Similarly to Splash logos, you just need to set its icon state to active by pressing "Activate Icon:
 > :warning:  **Unlike splash logos, activating an icon does NOT apply it to Player Settings right away.**  It will wait for you to build and do it during the build process.  This is by design, as the icon is meant to be a temporary placeholder during development and applying icons during build process allows for a safer restore of your previous icons after build process is complete.   
-
 
 
 
 <b>If you wish to automatate the contents of the Logo/Icon, proceed... </b>
 <br/><br/>
 
-## (2) Dynamic Options
+## (4) Dynamic Options
 
 The Dynamic Options feature will allow you to quickly update the splashdown file without manually typing in info. Its particularly useful for allowing splashdown to keep track of Dates or build versions. 
 Create a script like below and place it anywhere in your project. Though its recommended that you place it in an `Editor` folder. 
@@ -84,7 +83,7 @@ public static class Example
 <br/><br/>
 
 
-## (3) Add splashdown to your builds 
+## (5) Add splashdown to your builds 
 
 
 Any splashdown file that is set to `ACTIVE` will regenerate when unity is building. 
@@ -93,7 +92,7 @@ If you dont desire this behaviour, simply leave the splashdown files in `INACTIV
 If you always want full manual control, simply drag-and-drop the generated sprite as needed to your Player Settings. 
 
 
-## (4) Add Splashdown to your build pipeline through CLI
+## (6) Add Splashdown to your build pipeline through CLI
 
 
 below will activate the splashdown file with the provided filename, and apply the options. 
@@ -106,12 +105,12 @@ _yourUnityPath_ -batchmode -quit -projectPath _yourProjectPath_ -executeMethod S
 -name MySplashdown // the name of the splashdown file to apply. note that the default name is "MySplashdown" but you can replace with target filename.
 
 //Optional Flags:
--enable_splash // use as splash logo
--enable_icon // use as app icon
--disable_splash // remove logo from splash
--disable_icon") // remove icons and restore previous icons
--enableDynamic //sets dynamic options to false
--disableDynamic //sets dynamic options to true
+-enable_splash    // use as splash logo
+-enable_icon      // use as app icon
+-disable_splash   // remove logo from splash
+-disable_icon     // remove icons and restore previous icons
+-enableDynamic    //sets dynamic options to false
+-disableDynamic   //sets dynamic options to true
 ```
 
 Example for MacOS:
@@ -155,8 +154,9 @@ When you activate/deactivate a splash in the Splashdown inspector, it is automat
 For App icons, the Player settings dont allow for multiple icons for each category.  Hence, when you activate an Icon, the system will check for other existing activated icons and disable those first.  Hence, it will never allow you to have more than one icon activated at a time.  This silent behaviour will likely be modified in the future so a warning appears when trying to activate an icon when another icon is already active in that role. 
 
 
-## Switching Fonts [Experimental]
-The switching fonts feature is still WIP and its not guaranteed to work for custom provided fonts.  For now, I recommend sticking to the default Roboto_mono font.   New built-in fonts will be provided in the next release and the ability to use custom fonts is high-priority in the roadmap for future releases. 
+## Switching Fonts
+You can switch the font used by using the Font Selector field in the splashdown inspector. Any font asset in your project can be used.   The label above the font selector should update to show the path to the font currently being used.  Keep in mind the font Selector field is always shown empty as its used for drag-and-dropping font asset files.  
+After switching fonts, you will likey need to adjust the font size to fit your needs.  A feature to auto-resize the text will be introduced in a future release.  
 
 ## Customizing the Border
 Customizing the border is possible, but the effect is purely cosmetic so as a feature it is not high-priority in the roadmap.  If there is a use-case where modifying the borders provides an additional benefit other than cosmetic, pls open an issue describing your use-case and I will gladly look into it.  
@@ -185,9 +185,11 @@ You can disable the dynamic options with the optional flag provided.  You can al
   
 A Sprite is generated and saved as a sub-asset of the splashdown file. you can copy it to your clipboard from the project hierarchy, and paste it elsewhere in your project to get a clone.
 
-+ **Can I use asian alphabets (e.g kanji) ?**   
++ **Can I use asian alphabets (e.g kanji, Akson Thai, Hangu;) ?**   
 
-Yes!  but you will likely need to provide your own font as the built-in fonts are very limited in the amount of characters available.  See instructions for switching fonts and keep in mind feature is still experimental. 
+Yes!  but you will likely need to provide your own font as the built-in fonts are very limited in the amount of characters available.  The package comes with NanumGothic as a sample font that is compatible with korean characters.  
+There are plenty of open-source fonts available that are compatible with other languages. I have not included them in this package to avoid bloating the size of the package with unecessary fonts. 
+See instructions for adding & switching fonts and feel free to open an issue if you are unable to get your preferred language working properly. 
 
 
   

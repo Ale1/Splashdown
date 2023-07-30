@@ -2,8 +2,8 @@
   "name": "com.ale1.splashdown",
   "version": "1.0.0",
   "displayName": "Splashdown",
-  "description": "Custom Editor Splash and Icon generator",
-  "documentationUrl": "",
+  "description": "A unity open-source custom Splash splash and Icon generator",
+  "documentationUrl": "https://github.com/Ale1/Splashdown",
   "changelogUrl": "CHANGELOG.MD",
   "licensesUrl": "LICENCE.MD",
   "keywords": [
@@ -11,9 +11,9 @@
     "Coldtower"
   ],
   "author": {
-    "name": "Alejandro Barbero",
-    "email": "alejadro.barbero@gmail.com",
-    "url": ""
+    "name": "Ale1",
+    "email": "",
+    "url": "https://github.com/Ale1"
   },
   "unity": "2021.3",
   "unityRelease": "0f1"

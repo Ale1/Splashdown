@@ -83,6 +83,7 @@ namespace Splashdown.Editor
             backgroundColor = other.backgroundColor.hasValue ? other.backgroundColor : backgroundColor;
             textColor = other.textColor.hasValue ? other.textColor : textColor;
             SplashTime = other.SplashTime ?? SplashTime;
+            fontGUID = other.fontGUID ?? fontGUID;
         }
         
         public void ApplyDefaultValues()

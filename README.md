@@ -1,12 +1,10 @@
 
-## 🟨 NOTICE 🟨 
-_Package v1.0.0 is now available, but is in preview mode awaiting testing and Q.A => [![openupm](https://img.shields.io/npm/v/com.ale1.splashdown?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.ale1.splashdown/)
+
+| ![253230074-37fe6e8a-52dc-44cd-ae0a-321c54c53c1b](https://github.com/Ale1/Splashdown/assets/4612160/530b18c7-23b7-4bf4-b30b-5318b9c4bd62) | [![openupm](https://img.shields.io/npm/v/com.ale1.splashdown?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.ale1.splashdown/) <br> [![github](https://img.shields.io/static/v1?label=GitHub&message=Ale1.Splashdown)](https://github.com/Ale1/Splashdown) |
+|-|-|
 
 
-![253230074-37fe6e8a-52dc-44cd-ae0a-321c54c53c1b](https://github.com/Ale1/Splashdown/assets/4612160/530b18c7-23b7-4bf4-b30b-5318b9c4bd62)
-
-
-
+# Splashdown
 A Unity open-source splash and icon tool that will generate custom icons with user-provided text.  Allows for dynamic scripted content and to be incorporated into your build pipeline. 
 
 Its purpose is to aid in quick iteration of unity mobile games, and allow no-code team members such as Q.A testers, designers and general playtesters to quickly identify the build variant that is installed on their mobile device.  

@@ -1,6 +1,6 @@
 
-## 🟥 NOTICE 🟥
-_This is WIP and version 1.0.0 will be released soon on OpenNPM! (Expected July 31 - 2023)_
+## 🟨 NOTICE 🟨 
+_Package v1.0.0 is now available, but is in preview mode awaiting testing and Q.A => [![openupm](https://img.shields.io/npm/v/com.ale1.splashdown?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.ale1.splashdown/)
 
 
 ![253230074-37fe6e8a-52dc-44cd-ae0a-321c54c53c1b](https://github.com/Ale1/Splashdown/assets/4612160/530b18c7-23b7-4bf4-b30b-5318b9c4bd62)
@@ -20,8 +20,17 @@ The customizable text can be used to show things like date, author, build versio
 
 
 # Installation
-wip
+## Install via OpenUPM (recommended)
 
+1) Install openupm-cli via npm if you havent installed it before. => `npm install -g openupm-cli`)
+2) Install com.ale1.splashdown via command line. Make sure to run this command at the root of your Unity project =>openupm add com.ale1.splashdown
+
+## Install via Git URL
+
+Add the following line to the dependencies section of your project's manifest.json file
+
+"com.ale1.splashdown": "git+https://github.com/Ale1.Splashdown.git#1.0.0"
+The 1.0.0 represents the version tag to be fetched. Although it is discouraged, you can replace with `master` to always fetch the latest.
 
 
 # Getting Started 
@@ -124,7 +133,6 @@ MyEditorScript.PerformBuild
 ```
 
 # Advanced Customization
-
 
 ## Conflicting Options Resolution
 

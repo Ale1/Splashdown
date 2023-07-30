@@ -2,13 +2,22 @@
 ## com.coldtower.Splashdown
 
 
+##[0.9.0]
+### Added
+- new default korean font
+- options to resize fonts
+
+## [0.8.0]
+### Added
+- support for multiple splashdown files
+
 ## [0.7.0]
 ### Added 
 - optional flags for CLI builds
 
 ## [0.6.0]
 ### Removed
-- Splashdown file registry
+- Splashdown file registry in favor of GUID-based approach
 
 ## [0.5.0]
 

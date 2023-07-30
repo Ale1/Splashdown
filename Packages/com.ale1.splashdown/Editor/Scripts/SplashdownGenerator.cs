@@ -112,23 +112,32 @@ namespace Splashdown.Editor
         
         private static void AddText(this Texture2D texture, string text, int yPosition, Splashdown.Editor.Options options)
         {
-            //todo: use max text width instead of number of characters to decide if truncation is necessary. 
-            //remarks: right now since current font is monospaced, text character count is good measure of width, but to support other fonts will need to add individual characer widths.
-            if (text.Length > 10)
-            {
-                text = text.Substring(0, 10);
-                Debug.LogWarning($"Splashdown ::: text is too long to fit, will be truncated: '{text}...'");
-            }
-            
             var font = options.Font;
             if (font == null)
             {
                 font = Options.DefaultFont;
             }
-            var fontSize = font.fontSize;
+            var fontSize =  options.TargetFontSize.hasValue ? (int) options.TargetFontSize.ToInt() : font.fontSize;
 
             // Start text with 8% margin from the left
-            int startPosition = Mathf.FloorToInt(texture.width * 0.08f);
+            var margin = 0.08f;
+            int startPosition = Mathf.FloorToInt(texture.width * margin);
+            
+            // calculate the maximum width of the text to fit on the texture
+            int maxWidth = Mathf.FloorToInt(texture.width * (1-margin)) - startPosition;
+
+            while (GetTextWidth(text, font, fontSize) > maxWidth)
+            {
+                if (text.Length > 1)
+                {
+                    text = text.Substring(0, text.Length - 1);
+                }
+                else
+                {
+                    Debug.LogWarning("Splashdown ::: text is too long to fit, and could not be truncated enough: '" + text + "'");
+                    return;
+                }
+            }
 
             // Let's make the texture's height equal to the font's size plus some extra 
             RenderTexture rt = RenderTexture.GetTemporary(texture.width, (int)(fontSize * 1.1f));
@@ -190,6 +199,9 @@ namespace Splashdown.Editor
         }
         
 
+        ///<summary>
+        /// Get Text width if using baked-in fontSize
+        /// </summary>
         private static int GetTextWidth(string text, Font font)
         {
             int totalWidth = 0;
@@ -198,6 +210,22 @@ namespace Splashdown.Editor
             foreach (var ch in text)
             {
                 if (font.GetCharacterInfo(ch, out CharacterInfo chInfo, font.fontSize))
+                {
+                    totalWidth += chInfo.advance;
+                }
+            }
+
+            return totalWidth;
+        }
+        
+        private static int GetTextWidth(string text, Font font, int fontSize)
+        {
+            int totalWidth = 0;
+
+            // Calculate total width of the text
+            foreach (var ch in text)
+            {
+                if (font.GetCharacterInfo(ch, out CharacterInfo chInfo, fontSize))
                 {
                     totalWidth += chInfo.advance;
                 }

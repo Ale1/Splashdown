@@ -72,10 +72,15 @@ namespace Splashdown.Editor
                 importer.inspectorOptions = options;
                 EditorUtility.SetDirty(importer);
             }
+            EditorGUILayout.Space(40);
             
             EditorGUI.BeginChangeCheck();
-            EditorGUILayout.Space(40);
 
+            if (!options.TargetFontSize.hasValue)
+                options.TargetFontSize = Constants.MaxFontSize;
+            
+            options.TargetFontSize = EditorGUILayout.IntSlider(new GUIContent("Font Size"), (int) options.TargetFontSize, Constants.MinFontSize, Constants.MaxFontSize);
+            
             if (!string.IsNullOrEmpty(options.fontGUID))
             {
                 string path = AssetDatabase.GUIDToAssetPath(options.fontGUID);

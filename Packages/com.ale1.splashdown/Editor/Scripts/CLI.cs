@@ -10,12 +10,10 @@ namespace Splashdown.Editor
         
         public CLI()
         {
-            
         }
         
         public static void SetSplashOptions()
         {
-
             string[] args = System.Environment.GetCommandLineArgs();
             string name = null;
             bool? useSplash = null;
@@ -27,21 +25,24 @@ namespace Splashdown.Editor
 
             for (int i = 0; i < args.Length; i++)
             {
-
-                //todo: ignore caps
-                if (args[i] == "-name") name = args[i + 1];
-                else if (args[i].ToLower() == "-enable_splash") useSplash = true;
-                else if (args[i].ToLower() == "-enable_icon") useIcon = true;
-                else if (args[i].ToLower() == "-disable_splash") useSplash = false;
-                else if (args[i].ToLower() == "-disable_icon") useIcon = false;
-                else if (args[i].ToLower() == "-disable_dynamic") useDynamic = false;
-                else if (args[i].ToLower() == "-enable_dynamic") useDynamic = true;
-                else if (args[i].ToLower() == "-l1") l1 = args[i + 1];
-                else if (args[i].ToLower() == "-l2") l2 = args[i + 1];
-                else if (args[i].ToLower() == "-l3") l3 = args[i + 1];
+                var arg = args[i].ToLower();
+                
+                if (arg == "-name") name = args[i + 1];
+                else if (arg == "-enable_splash") useSplash = true;
+                else if (arg == "-enable_icon") useIcon = true;
+                else if (arg == "-disable_splash") useSplash = false;
+                else if (arg == "-disable_icon") useIcon = false;
+                else if (arg == "-disable_dynamic") useDynamic = false;
+                else if (arg == "-enable_dynamic") useDynamic = true;
+                else if (arg == "-l1") l1 = args[i + 1];
+                else if (arg == "-l2") l2 = args[i + 1];
+                else if (arg == "-l3") l3 = args[i + 1];
+                
+                //todo: add font size as CLI-compatible option
+                //else if (arg == "-size") fontSize = args[i + 1];
             }
             
-            if (name == null)
+            if (String.IsNullOrEmpty(name))
             {
                 Debug.LogError("Splashdown :: name cannot be empty");
                 return;

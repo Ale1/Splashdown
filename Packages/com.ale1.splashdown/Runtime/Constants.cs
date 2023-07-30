@@ -1,5 +1,3 @@
-
-
 using UnityEngine;
 
 namespace Splashdown
@@ -10,7 +8,7 @@ namespace Splashdown
         public static string EditorPrefsKey => PackageName;
         public const string DefaultFontName = "Roboto Mono";
         public const string FontPath_Roboto = "Packages/com.ale1.splashdown/Editor/Fonts/Splashdown_RobotoMono.ttf";
-        public const string FontPath_Nanum = "Packages/com.ale1.splashdown/Editor/Fonts/Splashdown_NanumGothicCoding.ttf";
+        public const string FontPath_NanumGothic = "Packages/com.ale1.splashdown/Editor/Fonts/Splashdown_NanumGothicCoding.ttf";
         public const string GeneratedSpriteName = "GeneratedSprite";
         public const string GeneratedOptionsName = "Options";
         public const string SplashdownFileType = "splashdown";

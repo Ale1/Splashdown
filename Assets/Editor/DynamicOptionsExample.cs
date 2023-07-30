@@ -1,8 +1,7 @@
 using UnityEngine;
 
 public static class Example  
-{
-        
+{ 
         [Splashdown.OptionsProvider]
         public static Splashdown.Editor.Options ProvideSplashdownOptions() => new()
         {

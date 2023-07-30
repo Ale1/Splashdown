@@ -127,7 +127,7 @@ namespace Splashdown.Editor
             
             if (useDynamicOptions)
             {
-                var dynamicOptions = FetchDynamicOptions(name); ///todo: name filtering
+                var dynamicOptions = FetchDynamicOptions(name); 
                 if(dynamicOptions != null) options.UpdateWith(dynamicOptions);
             }
             
@@ -176,9 +176,9 @@ namespace Splashdown.Editor
         /// Listens to the icon state activation event. If the event is fired by another importer, it deactivates its own icon state.
         /// </summary>
         /// <param name="emiter">The importer that emitted the event.</param>
-        private void IconStateListener(AssetImporter emiter)
+        private void IconStateListener(AssetImporter emitter)
         {
-            if (ActiveIcon == true && emiter != this)
+            if (ActiveIcon == true && emitter != this)
             {
                 ActiveIcon = false;
             }

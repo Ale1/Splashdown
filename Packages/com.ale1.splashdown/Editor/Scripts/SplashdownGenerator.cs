@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using UnityEditor;
@@ -102,9 +101,6 @@ namespace Splashdown.Editor
             byte[] bytes = texture.EncodeToPNG();
             string fullPath =  targetPath.Replace("Assets", Application.dataPath);
 
-            //create parent directory if doesnt exist
-            //Directory.CreateDirectory(Path.GetDirectoryName(fullPath) ?? throw new InvalidOperationException());
-            
             File.WriteAllBytes(fullPath, bytes);
 
             return texture;
@@ -230,7 +226,6 @@ namespace Splashdown.Editor
                     totalWidth += chInfo.advance;
                 }
             }
-
             return totalWidth;
         }
 
@@ -304,7 +299,6 @@ namespace Splashdown.Editor
             SplashdownImporter importer = (SplashdownImporter)AssetImporter.GetAtPath(targetPath);
             EditorUtility.SetDirty(importer);
             importer.SaveAndReimport();
-            AssetDatabase.ImportAsset(targetPath); //todo: check if this necessary?
         }
 
         
@@ -325,7 +319,6 @@ namespace Splashdown.Editor
                     return true;
                 }
             }
-            
             return false;
         }
     }

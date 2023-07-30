@@ -1,6 +1,9 @@
 # Changelog 
 ## com.coldtower.Splashdown
 
+## [1.0.0]
+### Changed
+- first preview package in npm
 
 ##[0.9.0]
 ### Added

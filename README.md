@@ -53,12 +53,8 @@ By setting hitting `Activate Splash` button, the playerSettings will start using
 
 ### (3) Using it as App Icon
 The same generated sprite can be used as an app icon when you build.  Similarly to Splash logos, you just need to set its icon state to active by pressing "Activate Icon:
-> :warning:  **Unlike splash logos, activating an icon does NOT apply it to Player Settings right away.**  It will wait for you to build and do it during the build process.  This is by design, as the icon is meant to be a temporary placeholder during development and applying icons during build process allows for a safer restore of your previous icons after build process is complete.   
+> :warning:  **Unlike splash logos, activating an icon does NOT apply it to Player Settings right away.**  It will wait for the start of a app build process.  This is by design, as the icon is meant to be a temporary placeholder during development and applying icons during build process allows for a safer restore of your previous icons after build process is complete.   
 
-
-
-<b>If you wish to automatate the contents of the Logo/Icon, proceed... </b>
-<br/><br/>
 
 ## (4) Dynamic Options
 
@@ -68,7 +64,6 @@ The splashdown importer will automatically invoke methods with the `[Splashdown.
 Dynamically created Options will override any manual inputs in hte splashdown importer.
 
 ```csharp
-
 public static class Example  
 {
         [Splashdown.OptionsProvider] //Method with this atrribute must return a Splashdown.Options
@@ -85,9 +80,17 @@ public static class Example
 }
 ```
 
+Dynamic options can accept an optional parameter `name` that filters by filename (without extension), so it will only apply to specific Spashdowns. E.g: 
 
-<b>If you wish to automatically include the splashdown icon on every build, proceed....</b>
-<br/><br/>
+```csharp
+[Splashdown.OptionsProvider("MyBlueLogo")]
+//will only affect options of splashdown with name: 'MyBlueLogo.splashdown'
+public static Splashdown.Options ProvideSplashdownOptions() => new()
+{ 
+         ... 
+}
+```
+
 
 
 ## (5) Add splashdown to your builds 
@@ -95,8 +98,7 @@ public static class Example
 
 Any splashdown file that is set to `ACTIVE` will regenerate when unity is building. 
 This means the latest values from dynamic options will be used, as well as adding the splash and/or logo to your Player Settings.  
-If you dont desire this behaviour, simply leave the splashdown files in `INACTIVE` state.  
-If you always want full manual control, simply drag-and-drop the generated sprite as needed to your Player Settings. 
+If you dont desire this behaviour, simply leave the splashdown files in `INACTIVE` state.   
 
 
 ## (6) Add Splashdown to your build pipeline through CLI
@@ -152,24 +154,28 @@ Options with higher Priority will override ones with lower priority.
 Its possible to have multiple Splashdown assets in your project.   Keep in mind that they all must have unique names. 
 How the system handles multiple Splashdown files varies between splash logos and app icons: 
 
+
 ### Multiple Splash logos
 You can have any number of splashdown files set to "Active Splash".  All the Splash logos will be present sequentially in your splash screen. 
 When you activate/deactivate a splash in the Splashdown inspector, it is automatically added or removed from your Player Settings in editor-time.
 
+
 ### Multiple App Icons
-For App icons, the Player settings dont allow for multiple icons for each category.  Hence, when you activate an Icon, the system will check for other existing activated icons and disable those first.  Hence, it will never allow you to have more than one icon activated at a time.  This silent behaviour will likely be modified in the future so a warning appears when trying to activate an icon when another icon is already active in that role. 
+For App icons, the Player settings dont allow for multiple icons for each category.  Hence, when you activate an Icon, the system will check for other existing activated icons and disable those first.    
+This silent behaviour will be modified in the future to introduce a warning when trying to activate an icon when another icon is already active. 
 
 
 ## Switching Fonts
 You can switch the font used by using the Font Selector field in the splashdown inspector. Any font asset in your project can be used.   The label above the font selector should update to show the path to the font currently being used.  Keep in mind the font Selector field is always shown empty as its used for drag-and-dropping font asset files.  
 After switching fonts, you will likey need to adjust the font size to fit your needs.  A feature to auto-resize the text will be introduced in a future release.  
 
+
 ## Customizing the Border
-Customizing the border is possible, but the effect is purely cosmetic so as a feature it is not high-priority in the roadmap.  If there is a use-case where modifying the borders provides an additional benefit other than cosmetic, pls open an issue describing your use-case and I will gladly look into it.  
+Customizing the border is possible, but the feature is not high-priority in the roadmap.  If there is a use-case where modifying the borders provides an additional benefit other than cosmetic, pls open an issue describing your use-case and I will gladly look into it.  
 
 
 ## using a texture as background or watermark
-+ WIP
++ WIP.  Is in the roadmap and will be added in a future release. 
 
 
 # Supported Unity Versions
@@ -185,16 +191,16 @@ Customizing the border is possible, but the effect is purely cosmetic so as a fe
 # FAQ
 + **My Dynamic options are overriding the options passed through CLI!?**  
 
-You can disable the dynamic options with the optional flag provided.  You can also simply have the DynamicOptions only override a certain line (e.g line1) and leave the rest for the CLI options to fill. See Conflicting Options Resolution section. 
+You can disable the dynamic options with the optional flag provided.  You can also use Dynamic Options optional filter parameter or simply have the DynamicOptions only override a certain line and leave the rest for the CLI options to fill.  See Conflicting Options Resolution section. 
 
 + **I want to use the generated logo for something else, how can I extract the texture/sprite from the splashdown file?**
   
 A Sprite is generated and saved as a sub-asset of the splashdown file. you can copy it to your clipboard from the project hierarchy, and paste it elsewhere in your project to get a clone.
 
-+ **Can I use asian alphabets (e.g kanji, Akson Thai, Hangu;) ?**   
++ **Can I use asian alphabets (e.g kanji, Akson Thai, Hangul) ?**   
 
-Yes!  but you will likely need to provide your own font as the built-in fonts are very limited in the amount of characters available.  The package comes with NanumGothic as a sample font that is compatible with korean characters.  
-There are plenty of open-source fonts available that are compatible with other languages. I have not included them in this package to avoid bloating the size of the package with unecessary fonts. 
+Yes!  but you will likely need to provide your own font as the built-in fonts are very limited in the amount of characters available.  The package comes with NanumGothic as a sample font that is compatible with korean and RobotoMono (the default font) is compatible with cyrillic.  
+There are plenty of free fonts available that will work well with non-latin languages. I have not included them in this package to avoid bloating the size of the package with unecessary fonts. 
 See instructions for adding & switching fonts and feel free to open an issue if you are unable to get your preferred language working properly. 
 
 

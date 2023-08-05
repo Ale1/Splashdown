@@ -4,14 +4,31 @@ using UnityEditor;
 
 namespace Splashdown.Editor
 {
-    public class CLI
+    public static class CLI
     {
-        //Example: /Applications/Unity/Unity.app/Contents/MacOS/Unity -quit -batchmode -projectPath ~/Desktop/Splashdown -executeMethod Splashdown.Editor.CLI.SetSplashOptions -name MySplashdown -activeSplash -l1 hello -l2 cruel -l3 world
-        
-        public CLI()
-        {
-        }
-        
+        /// <summary>
+        /// Parses command line arguments to set various options for Splashdown.
+        /// </summary>
+        /// <remarks>
+        /// The method takes command line arguments to find a splashdown file by name (required), 
+        /// then toggle its use as a splash (optional),
+        /// toggle use as icon (optional), 
+        /// toggle dynamic behavior (optional), 
+        /// set three lines of text (optional),
+        /// and define the font size (optional). 
+        /// If the provided name is empty, it logs an error and returns.
+        /// The options are updated using the provided arguments, and the asset is then reimported.
+        ///
+        /// This method is intended to be called exclusively from an external command line. It is not
+        /// intended to be called programmatically from within the application.
+        /// </remarks>
+        /// <example>
+        /// An example of using this method with a command line instruction:
+        /// <code>
+        /// /Applications/Unity/Unity.app/Contents/MacOS/Unity -quit -batchmode -projectPath ~/Desktop/Splashdown -executeMethod Splashdown.Editor.CLI.SetSplashOptions -name MySplashdown -activeSplash -l1 hello -l2 cruel -l3 world -size 23
+        /// </code>
+        /// The `-name` parameter is required. Other parameters such as `-activeSplash`, `-l1`, `-l2`, `-l3`, and `-size` are optional.
+        /// </example>
         public static void SetSplashOptions()
         {
             string[] args = System.Environment.GetCommandLineArgs();
@@ -22,6 +39,7 @@ namespace Splashdown.Editor
             string l1 = null;
             string l2 = null;
             string l3 = null;
+            int? size = null;
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -37,9 +55,7 @@ namespace Splashdown.Editor
                 else if (arg == "-l1") l1 = args[i + 1];
                 else if (arg == "-l2") l2 = args[i + 1];
                 else if (arg == "-l3") l3 = args[i + 1];
-                
-                //todo: add font size as CLI-compatible option
-                //else if (arg == "-size") fontSize = args[i + 1];
+                else if (arg == "-size") size = Int32.TryParse(args[i + 1], out int inputSize) ? inputSize : null;
             }
             
             if (String.IsNullOrEmpty(name))
@@ -53,6 +69,7 @@ namespace Splashdown.Editor
                 line1 = l1, 
                 line2 = l2,
                 line3 = l3,
+                TargetFontSize = (SerializableInt) size
             };
 
             var guid = SplashdownUtils.GetGuidBySplashdownName(name);
@@ -82,7 +99,7 @@ namespace Splashdown.Editor
                 importer.SetActiveSplash( (bool) useSplash);
             }
 
-            if (importer != null && importer.IsIconActive != useIcon)
+            if (useIcon != null && importer.IsIconActive != useIcon)
             {
                 importer.SetActiveIconWithEvent( (bool) useIcon);
             }

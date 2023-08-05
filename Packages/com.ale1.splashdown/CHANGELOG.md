@@ -6,6 +6,7 @@
 - CLI now supports font size optional flag
 ### Fixed
 - CLI was treating -useIcon flag as non-optional
+- Link to license.md in UPM window
 
 ## [1.0.0]
 ### Changed

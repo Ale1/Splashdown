@@ -196,7 +196,11 @@ You can disable the dynamic options with the optional flag provided.  You can al
 
 + **I want to use the generated logo for something else, how can I extract the texture/sprite from the splashdown file?**
   
-A Sprite is generated and saved as a sub-asset of the splashdown file. you can copy it to your clipboard from the project hierarchy, and paste it elsewhere in your project to get a clone.
+A Sprite is generated and saved as a sub-asset of the splashdown file. you can copy it to your clipboard from the project hierarchy, and paste it elsewhere in your project to get a clone of the sprite.
+
++ **I disabled the unity splash screen, but instead want to use a generated splashdown logo for a custom splash screen. How do I reference the generated sprite for use in my scene?** 
+
+You can drag-and-drop any splashdown file unto the sprite field of an Image or Sprite Renderer component in your scene.  When the original splashdown sprite regenerates, so will the sprite in your scene.  If you want to keep the sprite static, see above about manually making a copy and using that as your Image/Sprite renderer sprite. 
 
 + **Can I use asian alphabets (e.g kanji, Akson Thai, Hangul) ?**   
 

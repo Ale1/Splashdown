@@ -205,4 +205,8 @@ There are plenty of free fonts available that will work well with non-latin lang
 See instructions for adding & switching fonts and feel free to open an issue if you are unable to get your preferred language working properly. 
 
 
+# License
+
+MIT License. Refer to the LICENSE.md file.
+
   

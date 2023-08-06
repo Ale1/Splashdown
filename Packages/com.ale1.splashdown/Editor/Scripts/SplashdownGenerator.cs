@@ -47,6 +47,7 @@ namespace Splashdown.Editor
         {
             // Create a new texture
             var texture = new Texture2D(360, 360, TextureFormat.RGBA32, false);
+            texture.filterMode = FilterMode.Point;
 
             if (options == null)
             {
@@ -136,7 +137,7 @@ namespace Splashdown.Editor
             }
 
             // Let's make the texture's height equal to the font's size plus some extra 
-            RenderTexture rt = RenderTexture.GetTemporary(texture.width, (int)(fontSize * 1.1f));
+            RenderTexture rt = RenderTexture.GetTemporary(texture.width, (int)(fontSize * 1.2f));
             RenderTexture.active = rt;
 
             // Clear the RenderTexture to desired color
@@ -162,7 +163,8 @@ namespace Splashdown.Editor
             {
                 if (font.GetCharacterInfo(text[i], out CharacterInfo ch, fontSize))
                 {
-                    Vector3 position = new Vector3(startPosition, fontSize, 0);
+                    //give extra room to descenders (hence the 0.85f)
+                    Vector3 position = new Vector3(startPosition, fontSize * 0.85f, 0);
 
                     // Vertices are defined counter-clockwise
                     GL.TexCoord(ch.uvTopLeft);

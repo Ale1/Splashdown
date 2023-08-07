@@ -106,12 +106,12 @@ If you dont desire this behaviour, simply leave the splashdown files in `INACTIV
 
 below will activate the splashdown file with the provided filename, and apply the options. 
 ```shell
-_yourUnityPath_ -batchmode -quit -projectPath _yourProjectPath_ -executeMethod Splashdown.Editor.CLI.SetSplashOptions -name MySplashdown -l1 hello -l2 banana -l3 world
+_yourUnityPath_ -batchmode -quit -projectPath _yourProjectPath_ -executeMethod Splashdown.Editor.CLI.SetSplashOptions -name MySplashdown -l1 hello -l2 banana -l3 world -size 44
 ```
 
 ```shell
 //Mandatory param:
--name MySplashdown // the name of the splashdown file to apply. note that the default name is "MySplashdown" but you can replace with target filename.
+-name MySplashdown // the name of the splashdown file to apply. note that the default name is "MySplashdown" but you should replace with target filename if you've changed it in your project.
 
 //Optional Flags:
 -enable_splash    // use as splash logo
@@ -120,15 +120,16 @@ _yourUnityPath_ -batchmode -quit -projectPath _yourProjectPath_ -executeMethod S
 -disable_icon     // remove icons and restore previous icons
 -enableDynamic    //sets dynamic options to false
 -disableDynamic   //sets dynamic options to true
+-size //sets the target font size (will be clamped if outside valid range)
 ```
 
 Example for MacOS:
 ```shell
- /Applications/Unity/Unity.app/Contents/MacOS/Unity -quit -batchmode -projectPath ~/Desktop/MyCoolGame -executeMethod Splashdown.Editor.CLI.SetSplashOptions -name MySplashdown -activeSplash -l1 hello -l2 cruel -l3 world
+ /Applications/Unity/Unity.app/Contents/MacOS/Unity -quit -batchmode -projectPath ~/Desktop/MyCoolGame -executeMethod Splashdown.Editor.CLI.SetSplashOptions -name MySplashdown -activeSplash -l1 hello -l2 cruel -l3 world - size 44
 ```
 Example for Windows:
 ```shell
-"C:\Program Files\Unity\Editor\Unity.exe" -quit -batchmode -projectPath "C:\Users\UserName\Documents\MyProject" -executeMethod Splashdown.Editor.CLI.SetSplashOptions -name "MySplashdown" -disableDynamic -l1 "Banana"
+"C:\Program Files\Unity\Editor\Unity.exe" -quit -batchmode -projectPath "C:\Users\UserName\Documents\MyProject" -executeMethod Splashdown.Editor.CLI.SetSplashOptions -name "MySplashdown" -disableDynamic -l1 "Banana" -l2 "Yellow" -size 52
 MyEditorScript.PerformBuild
 ```
 
@@ -180,12 +181,12 @@ Customizing the border is possible, but the feature is not high-priority in the 
 
 # Supported Unity Versions
 
-| Version   | Supported                |
-| --------  | ------------------------ |
-| < 2021.X  | ✖️ not supported         |
-| 2021.X    | ✅ supported             |
-| 2022.X    | ❔ supported (untested)  |
-| 2023.X    | ❔ supported (untested)  |
+| Version   | Supported                |  Notes                                                       |
+| --------  | ------------------------ | -------------------------------------------------------------|
+| < 2021.X  | ✖️ not supported         |  will support if error also applies to higher unity versions |   
+| 2021.X    | ✅ supported             |  pls submit issue if encountering problems                   |
+| 2022.X    | ❔ supported (untested)  |  (same as above)                                             |
+| 2023.X    | ❔ supported (untested)  |  (same as above)                                             |
 
 
 # FAQ
@@ -195,7 +196,11 @@ You can disable the dynamic options with the optional flag provided.  You can al
 
 + **I want to use the generated logo for something else, how can I extract the texture/sprite from the splashdown file?**
   
-A Sprite is generated and saved as a sub-asset of the splashdown file. you can copy it to your clipboard from the project hierarchy, and paste it elsewhere in your project to get a clone.
+A Sprite is generated and saved as a sub-asset of the splashdown file. you can copy it to your clipboard from the project hierarchy, and paste it elsewhere in your project to get a clone of the sprite.
+
++ **I disabled the unity splash screen, but instead want to use a generated splashdown logo for a custom splash screen. How do I reference the generated sprite for use in my scene?** 
+
+You can drag-and-drop any splashdown file unto the sprite field of an Image or Sprite Renderer component in your scene.  When the original splashdown sprite regenerates, so will the sprite in your scene.  If you want to keep the sprite static, see above about manually making a copy and using that as your Image/Sprite renderer sprite. 
 
 + **Can I use asian alphabets (e.g kanji, Akson Thai, Hangul) ?**   
 
@@ -203,5 +208,9 @@ Yes!  but you will likely need to provide your own font as the built-in fonts ar
 There are plenty of free fonts available that will work well with non-latin languages. I have not included them in this package to avoid bloating the size of the package with unecessary fonts. 
 See instructions for adding & switching fonts and feel free to open an issue if you are unable to get your preferred language working properly. 
 
+
+# License
+
+MIT License. Refer to the LICENSE.md file.
 
   

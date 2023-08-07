@@ -46,7 +46,7 @@ namespace Splashdown.Editor
         public static Texture2D CreateTexture(string targetPath, Splashdown.Editor.Options options)
         {
             // Create a new texture
-            var texture = new Texture2D(360, 360, TextureFormat.RGBA32, false);
+            var texture = new Texture2D(Splashdown.Constants.DefaultWidth, Constants.DefaultHeight, TextureFormat.RGBA32, false);
             texture.filterMode = FilterMode.Point;
 
             if (options == null)
@@ -54,17 +54,26 @@ namespace Splashdown.Editor
                 options = new Splashdown.Editor.Options(true);
             }
             
-
             // Fill the texture with the background color 
             Color[] pixels = new Color[texture.width * texture.height];
             for (int i = 0; i < pixels.Length; i++)
             {
                 pixels[i] = (UnityEngine.Color) options.backgroundColor;
             }
-
-            texture.SetPixels(pixels);
-            texture.Apply();
             
+            texture.SetPixels(pixels);
+
+            //Generate background texture if ref provided
+            var backgroundTexture = options.BackgroundTexture;
+            if (backgroundTexture != null && backgroundTexture.isReadable)
+            {
+                var tempTexture = backgroundTexture.TrimTextureToSquare();
+                tempTexture = tempTexture.ResizeTexture(Constants.DefaultWidth, Constants.DefaultHeight);
+                Color[] backgroundPixels = tempTexture.GetPixels();
+                texture.SetPixels(backgroundPixels);
+                texture.Apply();
+            }
+
             // Calculate the spacing between lines based on how many lines are not empty
             // Set the buffer zone at the top and bottom
             float buffer = texture.height * 0.1f; // 10% of the texture's height
@@ -105,6 +114,55 @@ namespace Splashdown.Editor
             File.WriteAllBytes(fullPath, bytes);
 
             return texture;
+        }
+        
+        
+        private static Texture2D TrimTextureToSquare(this Texture2D sourceTexture)
+        {
+            // Find the size of the square region to crop
+            int size = Mathf.Min(sourceTexture.width, sourceTexture.height);
+            
+            int startX = (sourceTexture.width - size) / 2;
+            int startY = (sourceTexture.height - size) / 2;
+
+            // Create a temporary render texture with the square size
+            RenderTexture renderTexture = RenderTexture.GetTemporary(size, size);
+
+            // Blit the source texture into the temporary render texture, cropping it to a square
+            Graphics.Blit(sourceTexture, renderTexture, new Vector2(1, 1), new Vector2(-startX / (float)sourceTexture.width, -startY / (float)sourceTexture.height));
+
+            // Set the temporary render texture as the active one
+            RenderTexture previous = RenderTexture.active;
+            RenderTexture.active = renderTexture;
+
+            // Read the pixels from the temporary render texture into a new Texture2D
+            Texture2D croppedTexture = new Texture2D(size, size);
+            croppedTexture.ReadPixels(new Rect(0, 0, size, size), 0, 0);
+            croppedTexture.Apply();
+
+            // Release the temporary render texture and restore the previous active render texture
+            RenderTexture.active = previous;
+            RenderTexture.ReleaseTemporary(renderTexture);
+
+            return croppedTexture;
+        }
+        
+        private static Texture2D ResizeTexture(this Texture2D sourceTexture, int targetWidth, int targetHeight)
+        {
+            Texture2D resultTexture = new Texture2D(targetWidth, targetHeight);
+            float scaleX = (float)sourceTexture.width / targetWidth;
+            float scaleY = (float)sourceTexture.height / targetHeight;
+            for (int y = 0; y < targetHeight; y++)
+            {
+                for (int x = 0; x < targetWidth; x++)
+                {
+                    int srcX = Mathf.Min(sourceTexture.width - 1, (int)(x * scaleX));
+                    int srcY = Mathf.Min(sourceTexture.height - 1, (int)(y * scaleY));
+                    resultTexture.SetPixel(x, y, sourceTexture.GetPixel(srcX, srcY));
+                }
+            }
+            resultTexture.Apply();
+            return resultTexture;
         }
         
         private static void AddText(this Texture2D texture, string text, int yPosition, Splashdown.Editor.Options options)

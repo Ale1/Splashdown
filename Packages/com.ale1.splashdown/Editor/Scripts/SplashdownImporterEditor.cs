@@ -30,7 +30,7 @@ namespace Splashdown.Editor
 
             EditorGUILayout.BeginHorizontal();
             
-            DrawLine();
+            DrawVerticalLine();
             
             EditorGUILayout.BeginVertical(GUILayout.Width(134));
             DrawSplashActivationButtons(importer, originalColor);
@@ -38,14 +38,14 @@ namespace Splashdown.Editor
             GUI.enabled = prevState;
             EditorGUILayout.EndVertical();
             
-            DrawLine();
+            DrawVerticalLine();
 
             EditorGUILayout.BeginVertical(GUILayout.Width(134));
             DrawIconActivationButtons(importer, originalColor);
             GUI.enabled = prevState;
             EditorGUILayout.EndVertical();
             
-            DrawLine();
+            DrawVerticalLine();
 
             EditorGUILayout.EndHorizontal();
        
@@ -57,6 +57,8 @@ namespace Splashdown.Editor
             //during reimport options can be null for a frame before inspector fetches new options, breaking inspector. 
             if (options == null)
                 return;
+            
+            DrawDivider();
             
             // Draw the Options fields
             EditorGUI.BeginChangeCheck();
@@ -72,7 +74,9 @@ namespace Splashdown.Editor
                 importer.inspectorOptions = options;
                 EditorUtility.SetDirty(importer);
             }
-            EditorGUILayout.Space(40);
+            EditorGUILayout.Space(20);
+            
+            DrawDivider();
             
             EditorGUI.BeginChangeCheck();
 
@@ -105,9 +109,8 @@ namespace Splashdown.Editor
             {
                 if (options.fontAsset != null)
                 {
-                    string assetPath = AssetDatabase.GetAssetPath(options.fontAsset);
-                    options.fontGUID = AssetDatabase.AssetPathToGUID(assetPath);
-                    options.fontAsset = null; // we clear it immediately after getting the GUID
+                    string fontPath = AssetDatabase.GetAssetPath(options.fontAsset);
+                    options.fontGUID = AssetDatabase.AssetPathToGUID(fontPath);
                 }
                 else
                 {
@@ -117,6 +120,32 @@ namespace Splashdown.Editor
                 importer.inspectorOptions = options;
                 EditorUtility.SetDirty(importer);
             }
+            
+            DrawDivider();
+            //Check for background Texture
+            EditorGUI.BeginChangeCheck();
+
+            options.backgroundTexture = (Texture2D)EditorGUILayout.ObjectField("background Texture:", options.BackgroundTexture, typeof(Texture2D), false);
+                
+            if (EditorGUI.EndChangeCheck())
+            {
+                if (options.backgroundTexture != null)
+                {
+                        string texturePath = AssetDatabase.GetAssetPath(options.backgroundTexture);
+                        options.backgroundTextureGuid = AssetDatabase.AssetPathToGUID(texturePath); 
+                }
+                else
+                {
+                    options.backgroundTextureGuid = string.Empty;
+                }
+                
+                importer.inspectorOptions = options;
+                EditorUtility.SetDirty(importer);
+            }
+            
+            DrawDivider();
+
+            
             ApplyRevertGUI();
         }
 
@@ -231,11 +260,21 @@ namespace Splashdown.Editor
             GUI.backgroundColor = originalColor;
         }
 
-        private void DrawLine()
+        private void DrawVerticalLine()
         {
             var rect = EditorGUILayout.GetControlRect(GUILayout.Height(108), GUILayout.Width(6));
             rect.width = 3;
             EditorGUI.DrawRect(rect, Color.gray);
         }
+        
+        void DrawDivider(int space = 10)
+        {
+            EditorGUILayout.Space(space);
+            Rect rect = EditorGUILayout.GetControlRect(false, 1);
+            EditorGUI.DrawRect(rect, new Color(0.5f, 0.5f, 0.5f, 1));
+            EditorGUILayout.Space(space);
+        }
+        
+        
     }
 }

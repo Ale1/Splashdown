@@ -17,6 +17,9 @@ namespace Splashdown
         public static Color DefaultTextColor = new (1f, 1f, 0.6f, 1f);
         public const int MinFontSize = 24;
         public const int MaxFontSize = 68;
-        
+        public const int DefaultWidth = 360;
+        public const int DefaultHeight = 360;
+
+
     }
 }

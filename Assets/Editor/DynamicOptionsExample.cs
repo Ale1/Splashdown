@@ -10,6 +10,21 @@ public static class Example
                 textColor = Color.red
         };
         
+        [Splashdown.ActivationProvider]
+        public static bool ProvideSplashdownActivationOverride(bool current)
+        {
+                if (UnityEngine.Debug.isDebugBuild)
+                {
+                        return true;
+                }
+                else
+                {
+                        return current;
+                }
+        }
+        
+        
+        
         
 }
 

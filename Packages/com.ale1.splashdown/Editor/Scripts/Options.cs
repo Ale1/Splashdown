@@ -2,6 +2,7 @@ using System;
 using JetBrains.Annotations;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Splashdown.Editor
 {
@@ -25,7 +26,7 @@ namespace Splashdown.Editor
 
         public SerializableColor backgroundColor;
         public SerializableColor textColor;
-
+        
         [CanBeNull] public string line1 = null;
         [CanBeNull] public string line2 = null;
         [CanBeNull] public string line3 = null;
@@ -37,13 +38,14 @@ namespace Splashdown.Editor
         
         
         [CanBeNull] public SerializableInt TargetFontSize;
-        [HideInInspector] [CanBeNull] public string fontGUID = null;
-        
+
         /// <summary>
-        /// Used as a temporary cache to load custom fonts dropped in the inspect, and then set to null.  
+        /// Used as a temporary cache to load custom fonts dropped in the inspector, and then reset to null.  
         /// </summary>
         /// <remarks>use the <see cref="Font"/> Property to actually fetch the font</remarks>
-        [HideInInspector] public Font fontAsset;
+        [NonSerialized] public Font fontAsset;
+        
+        [HideInInspector] [CanBeNull] public string fontGUID = null;
 
         public Font Font
         {
@@ -53,6 +55,25 @@ namespace Splashdown.Editor
                 if(path == null)
                     Debug.LogError("font path is null");
                 return AssetDatabase.LoadAssetAtPath<Font>(path);
+            }
+        }
+
+        
+        /// <summary>
+        /// Used as a temporary cache to load background textures dropped in the inspector, and then reset to null.  
+        /// </summary>
+        /// <remarks>use the <see cref="BackgroundTexture"/> Property to actually fetch the backgroundTexture</remarks>
+        [NonSerialized] public Texture2D backgroundTexture;
+        
+        [HideInInspector] [CanBeNull] public string backgroundTextureGuid = null;
+        public Texture2D BackgroundTexture
+        {
+            get
+            {
+                string path = AssetDatabase.GUIDToAssetPath(backgroundTextureGuid);
+                if(path == null)
+                    Debug.LogError("font path is null");
+                return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
             }
         }
         
@@ -88,6 +109,7 @@ namespace Splashdown.Editor
             SplashTime = other.SplashTime.hasValue ? other.SplashTime : SplashTime;
             fontGUID = other.fontGUID ?? fontGUID;
             TargetFontSize = other.TargetFontSize.hasValue ? other.TargetFontSize : TargetFontSize;
+            backgroundTextureGuid = other.backgroundTextureGuid ?? backgroundTextureGuid;
         }
         
         public void ApplyDefaultValues()

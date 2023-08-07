@@ -1,0 +1,33 @@
+fileFormatVersion: 2
+guid: fc55c26533e0441ddaf432f7bf82a813
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: faaa72a4488af429da728176488d23af, type: 3}
+  ActiveSplash: 0
+  ActiveIcon: 0
+  useDynamicOptions: 0
+  inspectorOptions:
+    fileName: MySplashdown
+    backgroundColor:
+      color: {r: 0.990566, g: 0.2756764, b: 0.2756764, a: 1}
+      hasValue: 1
+    textColor:
+      color: {r: 1, g: 1, b: 0.6, a: 1}
+      hasValue: 1
+    line1: 77
+    line2: dfdfdfdfdfdfdf
+    line3: v
+    SplashTime:
+      value: 4
+      hasValue: 1
+    TargetFontSize:
+      value: 52
+      hasValue: 1
+    fontGUID: 
+    backgroundTextureGuid: dafda880b182b4085b2a28de0d13758b
+    assetPath: Assets/MySplashdown.splashdown

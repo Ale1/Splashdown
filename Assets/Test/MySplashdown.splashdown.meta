@@ -19,9 +19,9 @@ ScriptedImporter:
     textColor:
       color: {r: 1, g: 1, b: 0.6, a: 1}
       hasValue: 1
-    line1: 77
+    line1: ff
     line2: dfdfdfdfdfdfdf
-    line3: v
+    line3: bgg
     SplashTime:
       value: 4
       hasValue: 1

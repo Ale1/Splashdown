@@ -2,6 +2,10 @@
 ## com.coldtower.Splashdown
 
 
+## [1.2.1]
+## Fixed
+- Splash logo was trying to fetch sprite by sub-asset name but sprite has been made main asset.
+
 ## [1.2.0]
 ### Added
 - new feature: Splashdowns can now use a texture as a background

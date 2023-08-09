@@ -87,12 +87,11 @@ namespace Splashdown.Editor
                 
                 foreach (var asset in assets)
                 {
-                    if (asset is Sprite sprite && sprite.name == Constants.GeneratedSpriteName)
+                    if (asset is Sprite sprite)
                     {
                         return sprite;
                     }
                 }
-
                 throw new Exception("empty sprite");
             }
         }

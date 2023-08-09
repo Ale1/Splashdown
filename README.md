@@ -175,8 +175,12 @@ After switching fonts, you will likey need to adjust the font size to fit your n
 Customizing the border is possible, but the feature is not high-priority in the roadmap.  If there is a use-case where modifying the borders provides an additional benefit other than cosmetic, pls open an issue describing your use-case and I will gladly look into it.  
 
 
-## using a texture as background or watermark
-+ WIP.  Is in the roadmap and will be added in a future release. 
+## using a texture as background
+
+Works best when using a square non-transparent texture of dimensions 360 x 360. 
+
+![Screenshot 2023-08-09 at 15 26 40](https://github.com/Ale1/Splashdown/assets/4612160/659b1fe7-f53b-4f72-b208-70b6563c952b)
+
 
 
 # Supported Unity Versions

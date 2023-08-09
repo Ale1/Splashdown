@@ -9,7 +9,9 @@ public static class Example
                 line2 = "Handsome",
                 textColor = Color.red
         };
+       
         
+        /* WIP
         [Splashdown.ActivationProvider]
         public static bool ProvideSplashdownActivationOverride(bool current)
         {
@@ -22,10 +24,7 @@ public static class Example
                         return current;
                 }
         }
-        
-        
-        
-        
+        */
 }
 
 

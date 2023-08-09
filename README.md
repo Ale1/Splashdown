@@ -33,12 +33,12 @@ The 1.0.0 represents the version tag to be fetched. Although it is discouraged, 
 
 # Getting Started 
 ## (1) Hello World
-Right-click on any location within the Assets Folder.  Select `Create > New Splashdown`.   
+*Right-click* on any location within the Assets Folder.  Navigate to `Create > New Splashdown` in the context menu.   
 A Splashdown file will appear. 
 
 Fill in the Splashdown Importer window and hit `Apply` button. 
 
-![Screenshot 2023-07-30 at 11 44 55](https://github.com/Ale1/Splashdown/assets/4612160/664ff1b0-5b9e-4b14-b2f3-61316d96eb7f)
+![Screenshot 2023-08-09 at 18 30 40](https://github.com/Ale1/Splashdown/assets/4612160/6928784d-a0b7-4137-bdcc-ad9e45bd0e49)
 
 
 Congrats! you generated your first custom Logo/Icon

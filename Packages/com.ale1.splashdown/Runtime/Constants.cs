@@ -19,6 +19,7 @@ namespace Splashdown
         public const int MaxFontSize = 68;
         public const int DefaultWidth = 360;
         public const int DefaultHeight = 360;
+        public const int DefaultSplashtime = 4; //seconds
 
 
     }

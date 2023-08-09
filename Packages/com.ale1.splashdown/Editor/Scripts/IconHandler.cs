@@ -10,20 +10,19 @@ namespace Splashdown.Editor
 {
     public class IconHandler : IDisposable
     {
-        private Sprite sprite;
-        
+        private Sprite _sprite;
         private Dictionary<PlatformIconKind, PlatformIcon[]> _backupIcons;
         
         public IconHandler(Options options)
         {
-            sprite = options.Sprite;
+            _sprite = options.Sprite;
         }
 
         public void SetIcons()
         {
             var transparentBackground = AssetDatabase.LoadAssetAtPath<Texture2D>("Packages/com.ale1.splashdown/Editor/splashdown_transparent.png");  //todo: move to constants
 
-            if (sprite == null || transparentBackground == null)
+            if (_sprite == null || transparentBackground == null)
             {
                 Debug.LogError("error loading sprites");
                 return;
@@ -54,7 +53,7 @@ namespace Splashdown.Editor
                     var splashdownIconArray = new Texture2D[size];
                     int index = size > 1 ? 1 : 0;
                     splashdownIconArray[0] = transparentBackground; // background transparent by default
-                    splashdownIconArray[index] = sprite.texture; //set foreground to splashdown
+                    splashdownIconArray[index] = _sprite.texture; //set foreground to splashdown
                     icons[i].SetTextures(splashdownIconArray);
                 }
 
@@ -116,7 +115,7 @@ namespace Splashdown.Editor
 
         public void Dispose()
         {
-            sprite = null;
+            _sprite = null;
             _backupIcons.Clear();
         }
         

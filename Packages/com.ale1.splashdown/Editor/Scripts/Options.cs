@@ -2,7 +2,6 @@ using System;
 using JetBrains.Annotations;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Splashdown.Editor
 {
@@ -19,7 +18,6 @@ namespace Splashdown.Editor
         public static string DefaultFontGUID => AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(DefaultFont));
         public static int DefaultFontSize => DefaultFont.fontSize;
         
-        public static int DefaultSplashtime => 4;
 
         [HideInInspector]
         public string fileName;
@@ -37,7 +35,7 @@ namespace Splashdown.Editor
         public int LineCount => (line1 != null ? 1 : 0) + (line2 != null ? 1 : 0) + (line3 != null ? 1 : 0);
         
         
-        [CanBeNull] public SerializableInt TargetFontSize;
+        public SerializableInt TargetFontSize;
 
         /// <summary>
         /// Used as a temporary cache to load custom fonts dropped in the inspector, and then reset to null.  
@@ -123,13 +121,15 @@ namespace Splashdown.Editor
                 textColor = Constants.DefaultTextColor;
 
             if (!SplashTime.hasValue)
-                SplashTime = DefaultSplashtime;
+                SplashTime = Constants.DefaultSplashtime;
 
             if (!TargetFontSize.hasValue)
                 TargetFontSize = DefaultFontSize;
         }
     }
     
+    
+    /// We use Serializable Color for consistent handling of nullables
     [Serializable]
     public struct SerializableColor
     {
@@ -144,7 +144,7 @@ namespace Splashdown.Editor
 
         public Color? ToColor()
         {
-            return hasValue ? color : (Color?)null;
+            return hasValue ? color : null;
         }
 
         public static implicit operator SerializableColor(Color color)
@@ -174,7 +174,7 @@ namespace Splashdown.Editor
         {
             if (hasValue)
             {
-                return Mathf.Clamp((int)value, Constants.MinFontSize, Constants.MaxFontSize);
+                return Mathf.Clamp(value, Constants.MinFontSize, Constants.MaxFontSize);
             }
             else
             {

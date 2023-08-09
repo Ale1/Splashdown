@@ -133,7 +133,7 @@ namespace Splashdown.Editor
             }
             
 
-            var key = Constants.EditorPrefsKey+"." + this.name;
+            var key = Constants.EditorPrefsKey+ "." + this.name;
             if(EditorPrefs.HasKey(key))
             {
                 var cliOptionsJson = EditorPrefs.GetString(key);
@@ -172,7 +172,6 @@ namespace Splashdown.Editor
             ctx.AddObjectToAsset("main sprite", sprite, thumbnail);
             ctx.AddObjectToAsset("Options", serializedOptions);
             ctx.SetMainObject(sprite);
-
         }
 
 
@@ -238,16 +237,14 @@ namespace Splashdown.Editor
                                 continue;
 
                             // If we get here, the method is valid
-
                             var dynamicOptions = (Options)method.Invoke(null, null);
-
                             return dynamicOptions;
                         }
                     }
                 }
             }
 
-            return null; // or throw an exception
+            return null; 
         }
     }
 }

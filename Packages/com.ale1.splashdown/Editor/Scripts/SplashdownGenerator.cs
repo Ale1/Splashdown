@@ -7,7 +7,7 @@ namespace Splashdown.Editor
     public static class SplashdownGenerator
     {
         private const string DefaultFilename = "MySplashdown";
-        const string DefaultFilenameWithExtension = DefaultFilename + Constants.SplashdownExtension; 
+        private const string DefaultFilenameWithExtension = DefaultFilename + Constants.SplashdownExtension; 
         
         [MenuItem("Assets/Create/New Splashdown")]
         public static void CreateNewSplashdownFromContextMenu()
@@ -119,38 +119,7 @@ namespace Splashdown.Editor
 
             return texture;
         }
-        
-        
-        private static Texture2D TrimTextureToSquare(this Texture2D sourceTexture)
-        {
-            // Find the size of the square region to crop
-            int size = Mathf.Min(sourceTexture.width, sourceTexture.height);
-            
-            int startX = (sourceTexture.width - size) / 2;
-            int startY = (sourceTexture.height - size) / 2;
 
-            // Create a temporary render texture with the square size
-            RenderTexture renderTexture = RenderTexture.GetTemporary(size, size);
-
-            // Blit the source texture into the temporary render texture, cropping it to a square
-            Graphics.Blit(sourceTexture, renderTexture, new Vector2(1, 1), new Vector2(-startX / (float)sourceTexture.width, -startY / (float)sourceTexture.height));
-
-            // Set the temporary render texture as the active one
-            RenderTexture previous = RenderTexture.active;
-            RenderTexture.active = renderTexture;
-
-            // Read the pixels from the temporary render texture into a new Texture2D
-            Texture2D croppedTexture = new Texture2D(size, size);
-            croppedTexture.ReadPixels(new Rect(0, 0, size, size), 0, 0);
-            croppedTexture.Apply();
-
-            // Release the temporary render texture and restore the previous active render texture
-            RenderTexture.active = previous;
-            RenderTexture.ReleaseTemporary(renderTexture);
-
-            return croppedTexture;
-        }
-        
         private static Texture2D ResizeTexture(this Texture2D sourceTexture, int targetWidth, int targetHeight)
         {
             Texture2D resultTexture = new Texture2D(targetWidth, targetHeight);

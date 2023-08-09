@@ -62,9 +62,9 @@ namespace Splashdown.Editor
             // Draw the Options fields
             EditorGUI.BeginChangeCheck();
             //todo: show warning when these inspector options will be overriden by dynamic options. e.g: "if(importer.dynamicOptions && dynamicOptions.hasLine1) => |show warning|"
-            options.line1 = EditorGUILayout.TextField("Line 1", options.line1 ?? null);
-            options.line2 = EditorGUILayout.TextField("Line 2", options.line2 ?? null);
-            options.line3 = EditorGUILayout.TextField("Line 3", options.line3 ?? null);
+            options.line1 = EditorGUILayout.TextField("Line 1", options.line1);
+            options.line2 = EditorGUILayout.TextField("Line 2", options.line2);
+            options.line3 = EditorGUILayout.TextField("Line 3", options.line3);
             options.backgroundColor = EditorGUILayout.ColorField("Background Color", (UnityEngine.Color) options.backgroundColor);
             options.textColor = EditorGUILayout.ColorField("Text Color Color", (UnityEngine.Color) options.textColor);
 
@@ -123,7 +123,8 @@ namespace Splashdown.Editor
             DrawDivider();
             //Check for background Texture
             EditorGUI.BeginChangeCheck();
-
+            
+            
             options.backgroundTexture = (Texture2D)EditorGUILayout.ObjectField("background Texture:", options.BackgroundTexture, typeof(Texture2D), false);
                 
             if(options.backgroundTexture != null && (options.backgroundTexture.width != Constants.DefaultWidth || options.backgroundTexture.height != Constants.DefaultHeight))
@@ -273,7 +274,7 @@ namespace Splashdown.Editor
             EditorGUI.DrawRect(rect, Color.gray);
         }
         
-        void DrawDivider(int space = 10)
+        private void DrawDivider(int space = 10)
         {
             EditorGUILayout.Space(space);
             Rect rect = EditorGUILayout.GetControlRect(false, 1);

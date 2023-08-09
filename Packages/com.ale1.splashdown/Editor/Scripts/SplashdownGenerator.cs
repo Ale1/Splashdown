@@ -67,9 +67,13 @@ namespace Splashdown.Editor
             var backgroundTexture = options.BackgroundTexture;
             if (backgroundTexture != null && backgroundTexture.isReadable)
             {
-                var tempTexture = backgroundTexture.TrimTextureToSquare();
-                tempTexture = tempTexture.ResizeTexture(Constants.DefaultWidth, Constants.DefaultHeight);
-                Color[] backgroundPixels = tempTexture.GetPixels();
+                //safer to work with copy of texture to avoid reimport loops.
+                Texture2D copyTexture = new Texture2D(backgroundTexture.width, backgroundTexture.height);
+                copyTexture.SetPixels(backgroundTexture.GetPixels());
+                copyTexture.Apply();
+                
+                var resizedTexture = copyTexture.ResizeTexture(Constants.DefaultWidth, Constants.DefaultHeight);
+                Color[] backgroundPixels = resizedTexture.GetPixels();
                 texture.SetPixels(backgroundPixels);
                 texture.Apply();
             }

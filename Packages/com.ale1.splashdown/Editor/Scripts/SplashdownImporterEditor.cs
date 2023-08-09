@@ -48,7 +48,6 @@ namespace Splashdown.Editor
             DrawVerticalLine();
 
             EditorGUILayout.EndHorizontal();
-       
             
 
             EditorGUILayout.Space(30);
@@ -127,11 +126,18 @@ namespace Splashdown.Editor
 
             options.backgroundTexture = (Texture2D)EditorGUILayout.ObjectField("background Texture:", options.BackgroundTexture, typeof(Texture2D), false);
                 
+            if(options.backgroundTexture != null && (options.backgroundTexture.width != Constants.DefaultWidth || options.backgroundTexture.height != Constants.DefaultHeight))
+            {
+                
+                EditorGUILayout.LabelField($"For best results use a texture of size: {Constants.DefaultWidth} x {Constants.DefaultHeight}");
+                EditorGUILayout.LabelField($"(Current is {options.backgroundTexture.width} x {options.backgroundTexture.height})");
+            }
+            
             if (EditorGUI.EndChangeCheck())
             {
                 if (options.backgroundTexture != null)
                 {
-                        string texturePath = AssetDatabase.GetAssetPath(options.backgroundTexture);
+                    string texturePath = AssetDatabase.GetAssetPath(options.backgroundTexture);
                         options.backgroundTextureGuid = AssetDatabase.AssetPathToGUID(texturePath); 
                 }
                 else
@@ -142,7 +148,7 @@ namespace Splashdown.Editor
                 importer.inspectorOptions = options;
                 EditorUtility.SetDirty(importer);
             }
-            
+
             DrawDivider();
 
             

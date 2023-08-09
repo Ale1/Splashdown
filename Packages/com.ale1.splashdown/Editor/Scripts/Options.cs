@@ -18,14 +18,13 @@ namespace Splashdown.Editor
         public static string DefaultFontGUID => AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(DefaultFont));
         public static int DefaultFontSize => DefaultFont.fontSize;
         
-        public static int DefaultSplashtime => 4;
 
         [HideInInspector]
         public string fileName;
 
         public SerializableColor backgroundColor;
         public SerializableColor textColor;
-
+        
         [CanBeNull] public string line1 = null;
         [CanBeNull] public string line2 = null;
         [CanBeNull] public string line3 = null;
@@ -36,14 +35,15 @@ namespace Splashdown.Editor
         public int LineCount => (line1 != null ? 1 : 0) + (line2 != null ? 1 : 0) + (line3 != null ? 1 : 0);
         
         
-        [CanBeNull] public SerializableInt TargetFontSize;
-        [HideInInspector] [CanBeNull] public string fontGUID = null;
-        
+        public SerializableInt TargetFontSize;
+
         /// <summary>
-        /// Used as a temporary cache to load custom fonts dropped in the inspect, and then set to null.  
+        /// Used as a temporary cache to load custom fonts dropped in the inspector, and then reset to null.  
         /// </summary>
         /// <remarks>use the <see cref="Font"/> Property to actually fetch the font</remarks>
-        [HideInInspector] public Font fontAsset;
+        [NonSerialized] public Font fontAsset;
+        
+        [HideInInspector] [CanBeNull] public string fontGUID = null;
 
         public Font Font
         {
@@ -53,6 +53,25 @@ namespace Splashdown.Editor
                 if(path == null)
                     Debug.LogError("font path is null");
                 return AssetDatabase.LoadAssetAtPath<Font>(path);
+            }
+        }
+
+        
+        /// <summary>
+        /// Used as a temporary cache to load background textures dropped in the inspector, and then reset to null.  
+        /// </summary>
+        /// <remarks>use the <see cref="BackgroundTexture"/> Property to actually fetch the backgroundTexture</remarks>
+        [NonSerialized] public Texture2D backgroundTexture;
+        
+        [HideInInspector] [CanBeNull] public string backgroundTextureGuid = null;
+        public Texture2D BackgroundTexture
+        {
+            get
+            {
+                string path = AssetDatabase.GUIDToAssetPath(backgroundTextureGuid);
+                if(path == null)
+                    Debug.LogError("font path is null");
+                return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
             }
         }
         
@@ -88,6 +107,7 @@ namespace Splashdown.Editor
             SplashTime = other.SplashTime.hasValue ? other.SplashTime : SplashTime;
             fontGUID = other.fontGUID ?? fontGUID;
             TargetFontSize = other.TargetFontSize.hasValue ? other.TargetFontSize : TargetFontSize;
+            backgroundTextureGuid = other.backgroundTextureGuid ?? backgroundTextureGuid;
         }
         
         public void ApplyDefaultValues()
@@ -101,13 +121,15 @@ namespace Splashdown.Editor
                 textColor = Constants.DefaultTextColor;
 
             if (!SplashTime.hasValue)
-                SplashTime = DefaultSplashtime;
+                SplashTime = Constants.DefaultSplashtime;
 
             if (!TargetFontSize.hasValue)
                 TargetFontSize = DefaultFontSize;
         }
     }
     
+    
+    /// We use Serializable Color for consistent handling of nullables
     [Serializable]
     public struct SerializableColor
     {
@@ -122,7 +144,7 @@ namespace Splashdown.Editor
 
         public Color? ToColor()
         {
-            return hasValue ? color : (Color?)null;
+            return hasValue ? color : null;
         }
 
         public static implicit operator SerializableColor(Color color)
@@ -152,7 +174,7 @@ namespace Splashdown.Editor
         {
             if (hasValue)
             {
-                return Mathf.Clamp((int)value, Constants.MinFontSize, Constants.MaxFontSize);
+                return Mathf.Clamp(value, Constants.MinFontSize, Constants.MaxFontSize);
             }
             else
             {

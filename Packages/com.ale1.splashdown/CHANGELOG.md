@@ -1,6 +1,14 @@
 # Changelog 
 ## com.coldtower.Splashdown
 
+
+## [1.2.0]
+### Added
+- new feature: Splashdowns can now use a texture as a background
+- splashdown files now have custom icon (crappy icon art is placeholder)
+### Changed
+- default unity editor version bump to 2021.3.29
+
 ## [1.1.0]
 ### Added
 - CLI now supports font size optional flag

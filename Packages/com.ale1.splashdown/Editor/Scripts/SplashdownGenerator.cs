@@ -7,7 +7,7 @@ namespace Splashdown.Editor
     public static class SplashdownGenerator
     {
         private const string DefaultFilename = "MySplashdown";
-        const string DefaultFilenameWithExtension = DefaultFilename + Constants.SplashdownExtension; 
+        private const string DefaultFilenameWithExtension = DefaultFilename + Constants.SplashdownExtension; 
         
         [MenuItem("Assets/Create/New Splashdown")]
         public static void CreateNewSplashdownFromContextMenu()
@@ -46,24 +46,38 @@ namespace Splashdown.Editor
         public static Texture2D CreateTexture(string targetPath, Splashdown.Editor.Options options)
         {
             // Create a new texture
-            var texture = new Texture2D(360, 360, TextureFormat.RGBA32, false);
+            var texture = new Texture2D(Splashdown.Constants.DefaultWidth, Constants.DefaultHeight, TextureFormat.RGBA32, false);
+            texture.filterMode = FilterMode.Point;
 
             if (options == null)
             {
                 options = new Splashdown.Editor.Options(true);
             }
             
-
             // Fill the texture with the background color 
             Color[] pixels = new Color[texture.width * texture.height];
             for (int i = 0; i < pixels.Length; i++)
             {
                 pixels[i] = (UnityEngine.Color) options.backgroundColor;
             }
-
-            texture.SetPixels(pixels);
-            texture.Apply();
             
+            texture.SetPixels(pixels);
+
+            //Generate background texture if ref provided
+            var backgroundTexture = options.BackgroundTexture;
+            if (backgroundTexture != null && backgroundTexture.isReadable)
+            {
+                //safer to work with copy of texture to avoid reimport loops.
+                Texture2D copyTexture = new Texture2D(backgroundTexture.width, backgroundTexture.height);
+                copyTexture.SetPixels(backgroundTexture.GetPixels());
+                copyTexture.Apply();
+                
+                var resizedTexture = copyTexture.ResizeTexture(Constants.DefaultWidth, Constants.DefaultHeight);
+                Color[] backgroundPixels = resizedTexture.GetPixels();
+                texture.SetPixels(backgroundPixels);
+                texture.Apply();
+            }
+
             // Calculate the spacing between lines based on how many lines are not empty
             // Set the buffer zone at the top and bottom
             float buffer = texture.height * 0.1f; // 10% of the texture's height
@@ -105,6 +119,24 @@ namespace Splashdown.Editor
 
             return texture;
         }
+
+        private static Texture2D ResizeTexture(this Texture2D sourceTexture, int targetWidth, int targetHeight)
+        {
+            Texture2D resultTexture = new Texture2D(targetWidth, targetHeight);
+            float scaleX = (float)sourceTexture.width / targetWidth;
+            float scaleY = (float)sourceTexture.height / targetHeight;
+            for (int y = 0; y < targetHeight; y++)
+            {
+                for (int x = 0; x < targetWidth; x++)
+                {
+                    int srcX = Mathf.Min(sourceTexture.width - 1, (int)(x * scaleX));
+                    int srcY = Mathf.Min(sourceTexture.height - 1, (int)(y * scaleY));
+                    resultTexture.SetPixel(x, y, sourceTexture.GetPixel(srcX, srcY));
+                }
+            }
+            resultTexture.Apply();
+            return resultTexture;
+        }
         
         private static void AddText(this Texture2D texture, string text, int yPosition, Splashdown.Editor.Options options)
         {
@@ -136,11 +168,11 @@ namespace Splashdown.Editor
             }
 
             // Let's make the texture's height equal to the font's size plus some extra 
-            RenderTexture rt = RenderTexture.GetTemporary(texture.width, (int)(fontSize * 1.1f));
+            RenderTexture rt = RenderTexture.GetTemporary(texture.width, (int)(fontSize * 1.2f));
             RenderTexture.active = rt;
 
             // Clear the RenderTexture to desired color
-            GL.Clear(true, true, (UnityEngine.Color) options.backgroundColor);
+            GL.Clear(true, true, Color.clear);
 
             Material fontMaterial = new Material(Shader.Find("GUI/Text Shader"));
 
@@ -162,7 +194,8 @@ namespace Splashdown.Editor
             {
                 if (font.GetCharacterInfo(text[i], out CharacterInfo ch, fontSize))
                 {
-                    Vector3 position = new Vector3(startPosition, fontSize, 0);
+                    //give extra room to descenders (hence the 0.85f)
+                    Vector3 position = new Vector3(startPosition, fontSize * 0.85f, 0);
 
                     // Vertices are defined counter-clockwise
                     GL.TexCoord(ch.uvTopLeft);
@@ -182,13 +215,21 @@ namespace Splashdown.Editor
             GL.End();
             GL.PopMatrix();
 
+            
             Texture2D textTexture = new Texture2D(rt.width, rt.height, TextureFormat.RGBA32, false);
             textTexture.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
             textTexture.Apply();
 
-            Color[] pixels = textTexture.GetPixels();
-            
-            texture.SetPixels(0, yPosition, textTexture.width, textTexture.height, pixels);
+            //Blend pixels to respect transparency
+            Color[] textPixels = textTexture.GetPixels();
+            Color[] originalPixels = texture.GetPixels(0, yPosition, textTexture.width, textTexture.height);
+
+            for (int i = 0; i < textPixels.Length; i++) {
+                float alpha = textPixels[i].a; // the alpha of the text pixel
+                originalPixels[i] = textPixels[i] * alpha + originalPixels[i] * (1f - alpha); // blending the pixels
+            }
+
+            texture.SetPixels(0, yPosition, textTexture.width, textTexture.height, originalPixels);
 
             RenderTexture.active = null;
             RenderTexture.ReleaseTemporary(rt);

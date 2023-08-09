@@ -21,11 +21,12 @@ namespace Splashdown.Editor
         public bool IsSplashActive => ActiveSplash;
         public bool IsIconActive => ActiveIcon;
 
-        
         public bool useDynamicOptions;
         
         [HideInInspector] public Options inspectorOptions;
-        
+
+        private Texture2D thumbnail => AssetDatabase.LoadAssetAtPath<Texture2D>("Packages/com.ale1.splashdown/Editor/splashdown_thumbnail.png"); 
+
         public SplashdownImporter()
         {
             SplashdownEvents.OnIconStateActivated -= IconStateListener;
@@ -132,7 +133,7 @@ namespace Splashdown.Editor
             }
             
 
-            var key = Constants.EditorPrefsKey+"." + this.name;
+            var key = Constants.EditorPrefsKey+ "." + this.name;
             if(EditorPrefs.HasKey(key))
             {
                 var cliOptionsJson = EditorPrefs.GetString(key);
@@ -153,6 +154,7 @@ namespace Splashdown.Editor
             // Convert the bytes to texture.
             var texture = new Texture2D(320, 320);
             texture.LoadImage(fileData);
+            texture.name = "GeneratedTexture";
 
             // Create a sprite from the texture
             var sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
@@ -167,10 +169,11 @@ namespace Splashdown.Editor
 
             // Add objects to the imported asset
             ctx.AddObjectToAsset("main tex", texture);
-            ctx.AddObjectToAsset("main sprite", sprite);
+            ctx.AddObjectToAsset("main sprite", sprite, thumbnail);
             ctx.AddObjectToAsset("Options", serializedOptions);
-            ctx.SetMainObject(texture);
+            ctx.SetMainObject(sprite);
         }
+
 
         /// <summary>
         /// Listens to the icon state activation event. If the event is fired by another importer, it deactivates its own icon state.
@@ -234,16 +237,14 @@ namespace Splashdown.Editor
                                 continue;
 
                             // If we get here, the method is valid
-
                             var dynamicOptions = (Options)method.Invoke(null, null);
-
                             return dynamicOptions;
                         }
                     }
                 }
             }
 
-            return null; // or throw an exception
+            return null; 
         }
     }
 }

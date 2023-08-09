@@ -30,7 +30,7 @@ namespace Splashdown.Editor
 
             EditorGUILayout.BeginHorizontal();
             
-            DrawLine();
+            DrawVerticalLine();
             
             EditorGUILayout.BeginVertical(GUILayout.Width(134));
             DrawSplashActivationButtons(importer, originalColor);
@@ -38,17 +38,16 @@ namespace Splashdown.Editor
             GUI.enabled = prevState;
             EditorGUILayout.EndVertical();
             
-            DrawLine();
+            DrawVerticalLine();
 
             EditorGUILayout.BeginVertical(GUILayout.Width(134));
             DrawIconActivationButtons(importer, originalColor);
             GUI.enabled = prevState;
             EditorGUILayout.EndVertical();
             
-            DrawLine();
+            DrawVerticalLine();
 
             EditorGUILayout.EndHorizontal();
-       
             
 
             EditorGUILayout.Space(30);
@@ -58,12 +57,14 @@ namespace Splashdown.Editor
             if (options == null)
                 return;
             
+            DrawDivider();
+            
             // Draw the Options fields
             EditorGUI.BeginChangeCheck();
             //todo: show warning when these inspector options will be overriden by dynamic options. e.g: "if(importer.dynamicOptions && dynamicOptions.hasLine1) => |show warning|"
-            options.line1 = EditorGUILayout.TextField("Line 1", options.line1 ?? null);
-            options.line2 = EditorGUILayout.TextField("Line 2", options.line2 ?? null);
-            options.line3 = EditorGUILayout.TextField("Line 3", options.line3 ?? null);
+            options.line1 = EditorGUILayout.TextField("Line 1", options.line1);
+            options.line2 = EditorGUILayout.TextField("Line 2", options.line2);
+            options.line3 = EditorGUILayout.TextField("Line 3", options.line3);
             options.backgroundColor = EditorGUILayout.ColorField("Background Color", (UnityEngine.Color) options.backgroundColor);
             options.textColor = EditorGUILayout.ColorField("Text Color Color", (UnityEngine.Color) options.textColor);
 
@@ -72,7 +73,9 @@ namespace Splashdown.Editor
                 importer.inspectorOptions = options;
                 EditorUtility.SetDirty(importer);
             }
-            EditorGUILayout.Space(40);
+            EditorGUILayout.Space(20);
+            
+            DrawDivider();
             
             EditorGUI.BeginChangeCheck();
 
@@ -105,9 +108,8 @@ namespace Splashdown.Editor
             {
                 if (options.fontAsset != null)
                 {
-                    string assetPath = AssetDatabase.GetAssetPath(options.fontAsset);
-                    options.fontGUID = AssetDatabase.AssetPathToGUID(assetPath);
-                    options.fontAsset = null; // we clear it immediately after getting the GUID
+                    string fontPath = AssetDatabase.GetAssetPath(options.fontAsset);
+                    options.fontGUID = AssetDatabase.AssetPathToGUID(fontPath);
                 }
                 else
                 {
@@ -117,6 +119,40 @@ namespace Splashdown.Editor
                 importer.inspectorOptions = options;
                 EditorUtility.SetDirty(importer);
             }
+            
+            DrawDivider();
+            //Check for background Texture
+            EditorGUI.BeginChangeCheck();
+            
+            
+            options.backgroundTexture = (Texture2D)EditorGUILayout.ObjectField("background Texture:", options.BackgroundTexture, typeof(Texture2D), false);
+                
+            if(options.backgroundTexture != null && (options.backgroundTexture.width != Constants.DefaultWidth || options.backgroundTexture.height != Constants.DefaultHeight))
+            {
+                
+                EditorGUILayout.LabelField($"For best results use a texture of size: {Constants.DefaultWidth} x {Constants.DefaultHeight}");
+                EditorGUILayout.LabelField($"(Current is {options.backgroundTexture.width} x {options.backgroundTexture.height})");
+            }
+            
+            if (EditorGUI.EndChangeCheck())
+            {
+                if (options.backgroundTexture != null)
+                {
+                    string texturePath = AssetDatabase.GetAssetPath(options.backgroundTexture);
+                        options.backgroundTextureGuid = AssetDatabase.AssetPathToGUID(texturePath); 
+                }
+                else
+                {
+                    options.backgroundTextureGuid = string.Empty;
+                }
+                
+                importer.inspectorOptions = options;
+                EditorUtility.SetDirty(importer);
+            }
+
+            DrawDivider();
+
+            
             ApplyRevertGUI();
         }
 
@@ -231,11 +267,21 @@ namespace Splashdown.Editor
             GUI.backgroundColor = originalColor;
         }
 
-        private void DrawLine()
+        private void DrawVerticalLine()
         {
             var rect = EditorGUILayout.GetControlRect(GUILayout.Height(108), GUILayout.Width(6));
             rect.width = 3;
             EditorGUI.DrawRect(rect, Color.gray);
         }
+        
+        private void DrawDivider(int space = 10)
+        {
+            EditorGUILayout.Space(space);
+            Rect rect = EditorGUILayout.GetControlRect(false, 1);
+            EditorGUI.DrawRect(rect, new Color(0.5f, 0.5f, 0.5f, 1));
+            EditorGUILayout.Space(space);
+        }
+        
+        
     }
 }

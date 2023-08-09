@@ -17,6 +17,7 @@ namespace Splashdown.Editor
             var value = JsonUtility.ToJson(opts);
             EditorPrefs.SetString(key, value);
         }
+        
 
         public static Options GetOptionsFromGuid(string guid)
         {

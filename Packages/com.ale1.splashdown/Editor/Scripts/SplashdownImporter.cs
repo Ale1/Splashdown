@@ -1,5 +1,6 @@
 // ReSharper disable RedundantUsingDirective
 using System;
+using System.ComponentModel.Design;
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -14,6 +15,7 @@ using OptionsProviderAttribute = Splashdown.OptionsProviderAttribute;
 namespace Splashdown.Editor
 {
     [ScriptedImporter(1, Constants.SplashdownFileType)]
+    [HelpURL("https://github.com/Ale1/Splashdown#readme")]
     public class SplashdownImporter : ScriptedImporter
     {
         [HideInInspector][SerializeField] protected bool ActiveSplash;

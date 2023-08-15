@@ -17,7 +17,6 @@ namespace Splashdown.Editor
         public static Font DefaultFont => AssetDatabase.LoadAssetAtPath<Font>(Constants.FontPath_Roboto);
         public static string DefaultFontGUID => AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(DefaultFont));
         public static int DefaultFontSize => DefaultFont.fontSize;
-        
 
         [HideInInspector]
         public string fileName;

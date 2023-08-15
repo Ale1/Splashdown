@@ -1,7 +1,10 @@
+using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 // ReSharper disable RedundantUsingDirective
 using Options = Splashdown.Editor.Options;
@@ -93,6 +96,66 @@ namespace Splashdown.Editor
             }
 
             return GetOptionsFromGuid(guid);
+        }
+        
+        
+        /// <summary>
+        /// Fetches dynamic Splashdown options by searching all assemblies for a method marked with the Splashdown.OptionsProviderAttribute that has the correct signature.
+        /// </summary>
+        /// <remarks>
+        /// If there are multiple methods in the assemblies that are marked with the Splashdown.OptionsProviderAttribute and have the correct signature,
+        /// this method is non-deterministic and it's not guaranteed to return the options from the same method every time.
+        /// </remarks>
+        /// <returns>
+        /// The Splashdown.Options returned by the first valid method it finds, or null if no valid method is found.
+        /// </returns>
+        public static Options FetchDynamicOptions(string targetName)
+        {
+            // Get all assemblies in the current AppDomain
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+            foreach (var assembly in assemblies)
+            {
+                foreach (var type in assembly.GetTypes())
+                {
+                    foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic |
+                                                           BindingFlags.Static))
+                    {
+                        // method has the SplashdownOptionProviderAttribute
+                        if (method.GetCustomAttributes(typeof(OptionsProviderAttribute), false)
+                                .FirstOrDefault() is OptionsProviderAttribute)
+                        {
+                            // check for correct implementation by reading the return type
+                            if (method.ReturnType != typeof(Options))
+                            {
+                                Debug.LogWarning(
+                                    $"Splashdown :: {method} with {nameof(OptionsProviderAttribute)} does not have correct return type ");
+                                continue;
+                            }
+
+                            // Check the parameters (should take none)
+                            var parameters = method.GetParameters();
+                            if (parameters.Length != 0)
+                            {
+                                Debug.LogWarning(
+                                    $"Splashdown :: {method} with {nameof(OptionsProviderAttribute)} should not take any parameters ");
+                                continue;
+                            }
+                            
+                            //Check Name is a match
+                            OptionsProviderAttribute attribute = (OptionsProviderAttribute)Attribute.GetCustomAttribute(method, typeof(OptionsProviderAttribute));
+                            if(attribute.Filter != null && attribute.Filter != targetName)
+                                continue;
+
+                            // If we get here, the method is valid
+                            var dynamicOptions = (Options)method.Invoke(null, null);
+                            return dynamicOptions;
+                        }
+                    }
+                }
+            }
+
+            return null; 
         }
     }
 }

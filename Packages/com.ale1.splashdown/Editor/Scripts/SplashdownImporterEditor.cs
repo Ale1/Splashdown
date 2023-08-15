@@ -1,7 +1,9 @@
 
 using UnityEditor;
 using UnityEditor.AssetImporters;
+using UnityEditor.Graphs;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Splashdown.Editor
 {
@@ -9,6 +11,65 @@ namespace Splashdown.Editor
     public class SplashdownImporterEditor : ScriptedImporterEditor
     {
         private Options options;
+
+        private GUIStyle _line1Style;
+        private GUIStyle _line2Style;
+        private GUIStyle _line3Style;
+        private GUIStyle _backgroundStyle;
+        private GUIStyle _textcolorStyle;
+
+        private string dynamicOptionsName;
+
+        public override void OnEnable()
+        {
+            base.OnEnable();
+            
+            Color defaultLabelColor = EditorStyles.label.normal.textColor;
+            var importer = (SplashdownImporter)target;
+            var dynamicOptions = importer.FetchDynamicOptions();
+            
+            
+            _line1Style = new GUIStyle(EditorStyles.label) 
+            {
+                normal = { textColor = dynamicOptions?.line1 != null ? Color.yellow: defaultLabelColor }
+            };
+
+            _line2Style = new GUIStyle(EditorStyles.label)
+            {
+                normal = { textColor = dynamicOptions?.line2 != null ? Color.yellow : defaultLabelColor }
+            };
+            
+            _line3Style = new GUIStyle(EditorStyles.label)
+            {
+                normal = { textColor = dynamicOptions?.line3 != null ? Color.yellow : defaultLabelColor }
+            };
+
+            _backgroundStyle = new GUIStyle(EditorStyles.label)
+            {
+                normal = 
+                {
+                    textColor = dynamicOptions is { backgroundColor: { hasValue: true } }
+                        ? Color.yellow
+                        : defaultLabelColor
+                }
+            };
+
+            _textcolorStyle = new GUIStyle(EditorStyles.label)
+            {
+                normal =
+                {
+                    textColor = dynamicOptions is { textColor: { hasValue: true } }
+                        ? Color.yellow
+                        : defaultLabelColor
+                }
+            };
+        }
+
+        //dont remove. It looks unecessary, but its actually unitybug where sometimes inspector is not disposed property if not explicitly disabled. 
+        public override void OnDisable()
+        {
+            base.OnDisable();
+        }
         
         public override void OnInspectorGUI()
         {
@@ -59,15 +120,37 @@ namespace Splashdown.Editor
             
             DrawDivider();
             
+            
+            
             // Draw the Options fields
             EditorGUI.BeginChangeCheck();
-            //todo: show warning when these inspector options will be overriden by dynamic options. e.g: "if(importer.dynamicOptions && dynamicOptions.hasLine1) => |show warning|"
-            options.line1 = EditorGUILayout.TextField("Line 1", options.line1);
-            options.line2 = EditorGUILayout.TextField("Line 2", options.line2);
-            options.line3 = EditorGUILayout.TextField("Line 3", options.line3);
-            options.backgroundColor = EditorGUILayout.ColorField("Background Color", (UnityEngine.Color) options.backgroundColor);
-            options.textColor = EditorGUILayout.ColorField("Text Color Color", (UnityEngine.Color) options.textColor);
-
+            
+            GUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(new GUIContent("Line 1", ""), _line1Style, GUILayout.Width(128));
+            options.line1 = EditorGUILayout.TextField(options.line1, GUILayout.MaxWidth(84));
+            GUILayout.EndHorizontal();
+            
+            GUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(new GUIContent("Line 2", ""), _line2Style, GUILayout.Width(128));
+            options.line2 = EditorGUILayout.TextField(options.line2, GUILayout.MaxWidth(84));
+            GUILayout.EndHorizontal();
+            
+            GUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(new GUIContent("Line 3", ""), _line3Style, GUILayout.Width(128));
+            options.line3 = EditorGUILayout.TextField(options.line3, GUILayout.MaxWidth(84));
+            GUILayout.EndHorizontal();
+            
+            GUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(new GUIContent("Background Color", "being overriden by Dynamic Options"), _backgroundStyle, GUILayout.Width(128));
+            options.backgroundColor = EditorGUILayout.ColorField((Color) options.backgroundColor, GUILayout.MaxWidth(84));
+            GUILayout.EndHorizontal();
+            
+            GUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(new GUIContent("Text Color",""), _textcolorStyle, GUILayout.Width(128));
+            options.textColor = EditorGUILayout.ColorField((Color) options.textColor, GUILayout.MaxWidth(84));
+            GUILayout.EndHorizontal();
+            
+            
             if (EditorGUI.EndChangeCheck())
             {
                 importer.inspectorOptions = options;

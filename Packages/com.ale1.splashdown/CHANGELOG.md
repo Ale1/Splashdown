@@ -1,9 +1,14 @@
 # Changelog 
-## com.coldtower.Splashdown
+## com.ale1.Splashdown
+
+
+##[1.2.2]
+### Added
+- Improvements to Splashdown inspector: options overriden by dynamic options will be marked with yellow label
 
 
 ## [1.2.1]
-## Fixed
+### Fixed
 - Splash logo was trying to fetch sprite by sub-asset name but sprite has been made main asset.
 
 ## [1.2.0]

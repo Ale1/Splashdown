@@ -2,7 +2,7 @@ using UnityEngine;
 
 public static class Example  
 { 
-        [Splashdown.OptionsProvider]
+        [Splashdown.OptionsProvider("MySplashdown")]
         public static Splashdown.Editor.Options ProvideSplashdownOptions() => new()
         {
                 line1 = "Hello",

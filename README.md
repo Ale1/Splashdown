@@ -58,10 +58,10 @@ The same generated sprite can be used as an app icon when you build.  Similarly 
 
 ## (4) Dynamic Options
 
-The Dynamic Options feature will allow you to quickly update the splashdown file without manually typing in info. Its particularly useful for allowing splashdown to keep track of Dates or build versions. 
-Create a script like below and place it anywhere in your project. Though its recommended that you place it in an `Editor` folder. 
+The Dynamic Options feature will allow you to quickly update the splashdown file without manually typing in info. Its particularly useful for allowing splashdown to keep track of dates or build versions. 
+Create a script like below and place it anywhere in your project (though preferably in an `Editor` folder). 
 The splashdown importer will automatically invoke methods with the `[Splashdown.OptionsProvider]` attribute whenever its refreshed. 
-Dynamically created Options will override any manual inputs in hte splashdown importer.
+Dynamically created Options will override any manual inputs in the splashdown importer.
 
 ```csharp
 public static class Example  
@@ -90,6 +90,13 @@ public static Splashdown.Options ProvideSplashdownOptions() => new()
          ... 
 }
 ```
+
+
+Values in the inspector that have been overriden by dynamic options will have a yellow label, e.g, in example below, `line1`, `line2` and `text color` values dont match the splashdown generated because these have been provided by a dynamic options script: 
+
+
+
+![Screenshot 2023-08-15 at 20 24 30](https://github.com/Ale1/Splashdown/assets/4612160/c0eda39d-a399-482d-aa9e-31650359be69)
 
 
 

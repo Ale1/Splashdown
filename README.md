@@ -43,7 +43,7 @@ Fill in the Splashdown Importer window and hit `Apply` button.
 
 Congrats! you generated your first custom Logo/Icon
 
-### (2) Using it as Splash Logo
+## (2) Using it as Splash Logo
 This generated sprite can be used as a logo in your Player Settings.
 By setting hitting `Activate Splash` button, the playerSettings will start using this sprite as its splash image:
 
@@ -51,7 +51,7 @@ By setting hitting `Activate Splash` button, the playerSettings will start using
 |:--:| 
 | *you can remove it by selecting "Deactive" in the splashdown editor* |
 
-### (3) Using it as App Icon
+## (3) Using it as App Icon
 The same generated sprite can be used as an app icon when you build.  Similarly to Splash logos, you just need to set its icon state to active by pressing "Activate Icon:
 > :warning:  **Unlike splash logos, activating an icon does NOT apply it to Player Settings right away.**  It will wait for the start of a app build process.  This is by design, as the icon is meant to be a temporary placeholder during development and applying icons during build process allows for a safer restore of your previous icons after build process is complete.   
 
@@ -152,7 +152,9 @@ Options with higher Priority will override ones with lower priority.
 
 ## Managing multiple Splashdown files
 
-Its possible to have multiple Splashdown assets in your project.   Keep in mind that they all must have unique names. 
+> [!IMPORTANT]
+> **Having Multiple Splashdown assets in your project is supported, but they each must have unique filenames.** 
+
 How the system handles multiple Splashdown files varies between splash logos and app icons: 
 
 
@@ -166,6 +168,14 @@ For App icons, the Player settings dont allow for multiple icons for each catego
 This silent behaviour will be modified in the future to introduce a warning when trying to activate an icon when another icon is already active. 
 
 
+## Using a texture as background
+
+Works best when using a square non-transparent texture of dimensions 360 x 360. 
+
+![Screenshot 2023-08-09 at 15 26 40](https://github.com/Ale1/Splashdown/assets/4612160/659b1fe7-f53b-4f72-b208-70b6563c952b)
+
+
+
 ## Switching Fonts
 You can switch the font used by using the Font Selector field in the splashdown inspector. Any font asset in your project can be used.   The label above the font selector should update to show the path to the font currently being used.  Keep in mind the font Selector field is always shown empty as its used for drag-and-dropping font asset files.  
 After switching fonts, you will likey need to adjust the font size to fit your needs.  A feature to auto-resize the text will be introduced in a future release.  
@@ -173,14 +183,6 @@ After switching fonts, you will likey need to adjust the font size to fit your n
 
 ## Customizing the Border
 Customizing the border is possible, but the feature is not high-priority in the roadmap.  If there is a use-case where modifying the borders provides an additional benefit other than cosmetic, pls open an issue describing your use-case and I will gladly look into it.  
-
-
-## using a texture as background
-
-Works best when using a square non-transparent texture of dimensions 360 x 360. 
-
-![Screenshot 2023-08-09 at 15 26 40](https://github.com/Ale1/Splashdown/assets/4612160/659b1fe7-f53b-4f72-b208-70b6563c952b)
-
 
 
 # Supported Unity Versions
@@ -198,15 +200,15 @@ Works best when using a square non-transparent texture of dimensions 360 x 360.
 
 You can disable the dynamic options with the optional flag provided.  You can also use Dynamic Options optional filter parameter or simply have the DynamicOptions only override a certain line and leave the rest for the CLI options to fill.  See Conflicting Options Resolution section. 
 
-+ **I want to use the generated logo for something else, how can I extract the texture/sprite from the splashdown file?**
++ **I want to use the generated logo for something else, how can I extract the texture from the splashdown file?**
   
-A Sprite is generated and saved as a sub-asset of the splashdown file. you can copy it to your clipboard from the project hierarchy, and paste it elsewhere in your project to get a clone of the sprite.
+A texture is generated and saved as a sub-asset of the splashdown file. you can copy it to your clipboard from the project hierarchy, and paste it elsewhere in your project to get a clone of the texture.  There are several ways to programatically extract the texture -let me know your use-case if you need assistance with this. 
 
-+ **I disabled the unity splash screen, but instead want to use a generated splashdown logo for a custom splash screen. How do I reference the generated sprite for use in my scene?** 
++ **I want use a generated splashdown logo for a custom splash screen. How do I reference the generated sprite for use in my scene?** 
 
 You can drag-and-drop any splashdown file unto the sprite field of an Image or Sprite Renderer component in your scene.  When the original splashdown sprite regenerates, so will the sprite in your scene.  If you want to keep the sprite static, see above about manually making a copy and using that as your Image/Sprite renderer sprite. 
 
-+ **Can I use asian alphabets (e.g kanji, Akson Thai, Hangul) ?**   
++ **Can I use non-latin alphabets (e.g Kanji, Akson Thai, Hangul) ?**   
 
 Yes!  but you will likely need to provide your own font as the built-in fonts are very limited in the amount of characters available.  The package comes with NanumGothic as a sample font that is compatible with korean and RobotoMono (the default font) is compatible with cyrillic.  
 There are plenty of free fonts available that will work well with non-latin languages. I have not included them in this package to avoid bloating the size of the package with unecessary fonts. 

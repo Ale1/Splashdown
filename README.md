@@ -27,8 +27,8 @@ The customizable text can be used to show things like date, author, build versio
 
 Add the following line to the dependencies section of your project's manifest.json file
 
-"com.ale1.splashdown": "git+https://github.com/Ale1.Splashdown.git#1.0.0"
-The 1.0.0 represents the version tag to be fetched. Although it is discouraged, you can replace with `master` to always fetch the latest.
+"com.ale1.splashdown": "git+https://github.com/Ale1.Splashdown.git#1.2.3"
+The 1.2.3 represents the version tag to be fetched. Although it is discouraged, you can replace with `master` to always fetch the latest.
 
 
 # Getting Started 
@@ -70,7 +70,7 @@ public static class Example
         public static Splashdown.Options ProvideSplashdownOptions() => new()
         { 
                 line1 = Application.unityVersion, // e.g 2021.3.4f
-                line2 = DateTime.Now.ToShortDateString(),
+                line2 = DateTime.Now.ToShortDateString(), 
                 line3 = Application.version, //e.g 2.1.0
                 textColor = Color.red,
 
@@ -80,7 +80,7 @@ public static class Example
 }
 ```
 
-Dynamic options can accept an optional parameter `name` that filters by filename (without extension), so it will only apply to specific Spashdowns. E.g: 
+Dynamic options can accept an optional filter parameter that filters by filename (without extension), so it will only apply to specific Spashdowns. E.g: 
 
 ```csharp
 [Splashdown.OptionsProvider("MyBlueLogo")]
@@ -92,11 +92,21 @@ public static Splashdown.Options ProvideSplashdownOptions() => new()
 ```
 
 
-Values in the inspector that have been overriden by dynamic options will have a yellow label, e.g, in example below, `line1`, `line2` and `text color` values dont match the splashdown generated because these have been provided by a dynamic options script: 
+The optional filter can use `"*"` as a wildcard regex character.  For example:
+```csharp
+[Splashdown.OptionsProvider("Dev*Logo")]
+//will match with any splashdown with names such as: 'DevRedLogo.splashdown', 'DevBlueLogo.splashdown', etc
+public static Splashdown.Options ProvideSplashdownOptions() => new()
+{ 
+         ... 
+}
+```
 
 
+Values in the inspector that have been overriden by dynamic options will have a yellow label, e.g, in example below, `line1`, `line2` and `text color` values dont match the splashdown generated because these have been provided by a dynamic options script. The Class and Method name creating these overrides can be seen inside the information box.
 
-![Screenshot 2023-08-15 at 20 24 30](https://github.com/Ale1/Splashdown/assets/4612160/c0eda39d-a399-482d-aa9e-31650359be69)
+![Screenshot 2023-08-27 at 14 36 59](https://github.com/Ale1/Splashdown/assets/4612160/af410d31-0616-4ea1-86c0-32825161178e)
+
 
 
 

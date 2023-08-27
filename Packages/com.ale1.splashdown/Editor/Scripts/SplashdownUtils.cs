@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using System.Text.RegularExpressions;
 using Object = UnityEngine.Object;
 
 // ReSharper disable RedundantUsingDirective
@@ -20,7 +21,6 @@ namespace Splashdown.Editor
             var value = JsonUtility.ToJson(opts);
             EditorPrefs.SetString(key, value);
         }
-        
 
         public static Options GetOptionsFromGuid(string guid)
         {
@@ -144,11 +144,15 @@ namespace Splashdown.Editor
                             
                             //Check Name is a match
                             OptionsProviderAttribute attribute = (OptionsProviderAttribute)Attribute.GetCustomAttribute(method, typeof(OptionsProviderAttribute));
-                            if(attribute.Filter != null && attribute.Filter != targetName)
+                            if(!IsNameMatch(attribute.Filter, targetName))
                                 continue;
 
                             // If we get here, the method is valid
                             var dynamicOptions = (Options)method.Invoke(null, null);
+                            
+                            //capture the name of the script where these dynamic options are coming from
+                            dynamicOptions.source = method.DeclaringType!.Name +"."+ method.Name;
+                            
                             return dynamicOptions;
                         }
                     }
@@ -156,6 +160,24 @@ namespace Splashdown.Editor
             }
 
             return null; 
+        }
+
+        public static bool IsNameMatch(string filter, string targetName)
+        {
+            //when filter is empty, by default we count that as a match.  
+            if (String.IsNullOrEmpty(filter))
+            {
+                return true;
+            }
+        
+            // Handle wildcard (*) matching
+            if (filter.Contains('*'))
+            {
+                string pattern = filter.Replace("*", ".*"); // Convert wildcard to regex
+                return Regex.IsMatch(targetName, "^" + pattern + "$");
+            }
+
+            return filter == targetName;
         }
     }
 }

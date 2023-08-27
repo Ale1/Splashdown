@@ -121,7 +121,7 @@ namespace Splashdown.Editor
             string filename = System.IO.Path.GetFileNameWithoutExtension(ctx.assetPath);
             this.name = filename;
             //save name of splashdown file in Options
-            options.fileName = filename;
+            options.source = filename;
             // Set the sprite path in the options
             options.assetPath = $"{ctx.assetPath}";
 

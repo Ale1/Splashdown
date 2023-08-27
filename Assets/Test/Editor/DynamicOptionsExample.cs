@@ -1,13 +1,13 @@
 using UnityEngine;
 
-public static class Example  
+public static class DynamicOptionsExample  
 { 
         [Splashdown.OptionsProvider("MySplashdown")]
-        public static Splashdown.Editor.Options ProvideSplashdownOptions() => new()
+        public static Splashdown.Editor.Options MyExample() => new()
         {
                 line1 = "Hello",
                 line2 = "Handsome",
-                textColor = Color.red
+                textColor = Color.red,
         };
        
         

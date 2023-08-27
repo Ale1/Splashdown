@@ -45,7 +45,7 @@ namespace Splashdown.Editor
                     .Select(x=> x.GetGuid)
                     .FirstOrDefault();
 
-                //we only process the first result as we cant have multiole icons.
+                //we only process the first result as we cant have multiple icons.
                 if (_activeIcon != null)
                 {
                     SplashdownController.SetIcons(_activeIcon);

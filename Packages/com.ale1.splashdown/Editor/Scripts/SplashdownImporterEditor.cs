@@ -1,9 +1,6 @@
-
 using UnityEditor;
 using UnityEditor.AssetImporters;
-using UnityEditor.Graphs;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace Splashdown.Editor
 {
@@ -18,61 +15,69 @@ namespace Splashdown.Editor
         private GUIStyle _backgroundStyle;
         private GUIStyle _textcolorStyle;
 
-        private string dynamicOptionsName;
+        private Options _dynamicOptions;
+        private bool _initialized;
 
-        public override void OnEnable()
+        private void ResetStyles()
         {
-            base.OnEnable();
-            
-            Color defaultLabelColor = EditorStyles.label.normal.textColor;
+            _line1Style = null;
+            _line2Style = null;
+            _line3Style = null;
+            _backgroundStyle = null;
+            _textcolorStyle = null;
+        }
+        
+        private void SetStyles()
+        {
+            Color defaultLabelColor = SplashdownStyles.DefaultLabelColor;
+            Color warningColor = SplashdownStyles.DynamicLabelColor;
             var importer = (SplashdownImporter)target;
-            var dynamicOptions = importer.FetchDynamicOptions();
+            bool useDynamic = importer.useDynamicOptions;
             
-            
-            _line1Style = new GUIStyle(EditorStyles.label) 
+            if(useDynamic)
+                _dynamicOptions = importer.FetchDynamicOptions();
+
+            _line1Style = new GUIStyle(SplashdownStyles.TemplateLabelStyle) 
             {
-                normal = { textColor = dynamicOptions?.line1 != null ? Color.yellow: defaultLabelColor }
+                normal = { textColor = useDynamic && _dynamicOptions?.line1 != null ? warningColor : defaultLabelColor }
             };
 
-            _line2Style = new GUIStyle(EditorStyles.label)
+            _line2Style = new GUIStyle(SplashdownStyles.TemplateLabelStyle)
             {
-                normal = { textColor = dynamicOptions?.line2 != null ? Color.yellow : defaultLabelColor }
+                normal = { textColor = useDynamic && _dynamicOptions?.line2 != null ? warningColor : defaultLabelColor }
             };
             
-            _line3Style = new GUIStyle(EditorStyles.label)
+            _line3Style = new GUIStyle(SplashdownStyles.TemplateLabelStyle)
             {
-                normal = { textColor = dynamicOptions?.line3 != null ? Color.yellow : defaultLabelColor }
+                normal = { textColor = useDynamic && _dynamicOptions?.line3 != null ? warningColor: defaultLabelColor }
             };
 
-            _backgroundStyle = new GUIStyle(EditorStyles.label)
+            _backgroundStyle = new GUIStyle(SplashdownStyles.TemplateLabelStyle)
             {
                 normal = 
                 {
-                    textColor = dynamicOptions is { backgroundColor: { hasValue: true } }
-                        ? Color.yellow
+                    textColor = useDynamic && _dynamicOptions is { backgroundColor: { hasValue: true } }
+                        ? warningColor
                         : defaultLabelColor
                 }
             };
 
-            _textcolorStyle = new GUIStyle(EditorStyles.label)
+            _textcolorStyle = new GUIStyle(SplashdownStyles.TemplateLabelStyle)
             {
                 normal =
                 {
-                    textColor = dynamicOptions is { textColor: { hasValue: true } }
-                        ? Color.yellow
+                    textColor = useDynamic && _dynamicOptions is { textColor: { hasValue: true } }
+                        ? warningColor
                         : defaultLabelColor
                 }
             };
         }
 
-        //dont remove. It looks unecessary, but its actually unitybug where sometimes inspector is not disposed property if not explicitly disabled. 
-        public override void OnDisable()
-        {
-            base.OnDisable();
-        }
-        
         public override void OnInspectorGUI()
         {
+            if(_line1Style == null)
+                SetStyles();
+            
             var importer = (SplashdownImporter)target;
             
             if(options == null)
@@ -110,43 +115,51 @@ namespace Splashdown.Editor
 
             EditorGUILayout.EndHorizontal();
             
+            EditorGUILayout.Space(24);
 
-            EditorGUILayout.Space(30);
-            DrawDefaultInspectorWithoutScript();
-            
             //during reimport options can be null for a frame before inspector fetches new options, breaking inspector. 
             if (options == null)
                 return;
             
             DrawDivider();
             
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(new GUIContent("Use Dynamic Options", ""), EditorStyles.boldLabel, GUILayout.Width(150));
+            var toggle = EditorGUILayout.Toggle(importer.useDynamicOptions);
+            if (toggle != importer.useDynamicOptions)
+            {
+                importer.useDynamicOptions = toggle;
+                EditorUtility.SetDirty(importer);
+                ResetStyles();
+                return;
+            }
+            EditorGUILayout.EndHorizontal();
             
-            
-            // Draw the Options fields
+
             EditorGUI.BeginChangeCheck();
             
-            GUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(new GUIContent("Line 1", ""), _line1Style, GUILayout.Width(128));
-            options.line1 = EditorGUILayout.TextField(options.line1, GUILayout.MaxWidth(84));
-            GUILayout.EndHorizontal();
+            if (toggle && _dynamicOptions != null)
+            {
+                EditorGUILayout.Space(6);
+                GUILayout.BeginHorizontal();
+                EditorGUILayout.HelpBox($"some values overriden by: {_dynamicOptions.source}", MessageType.Info);
+                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.Space(12);
+            }
+            
+            // Draw the Options fields
+
+            DrawLabelWithText(ref options.line1, "Line 1", _dynamicOptions?.line1, _line1Style);
+            DrawLabelWithText(ref options.line2, "Line 2", _dynamicOptions?.line2, _line2Style);
+            DrawLabelWithText(ref options.line3, "Line 3", _dynamicOptions?.line3, _line3Style);
             
             GUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(new GUIContent("Line 2", ""), _line2Style, GUILayout.Width(128));
-            options.line2 = EditorGUILayout.TextField(options.line2, GUILayout.MaxWidth(84));
-            GUILayout.EndHorizontal();
-            
-            GUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(new GUIContent("Line 3", ""), _line3Style, GUILayout.Width(128));
-            options.line3 = EditorGUILayout.TextField(options.line3, GUILayout.MaxWidth(84));
-            GUILayout.EndHorizontal();
-            
-            GUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(new GUIContent("Background Color", "being overriden by Dynamic Options"), _backgroundStyle, GUILayout.Width(128));
+            EditorGUILayout.LabelField(new GUIContent("Background Color", _dynamicOptions?.backgroundColor.ToString()), _backgroundStyle, GUILayout.Width(128));
             options.backgroundColor = EditorGUILayout.ColorField((Color) options.backgroundColor, GUILayout.MaxWidth(84));
             GUILayout.EndHorizontal();
             
             GUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(new GUIContent("Text Color",""), _textcolorStyle, GUILayout.Width(128));
+            EditorGUILayout.LabelField(new GUIContent("Text Color",_dynamicOptions?.backgroundColor.ToString()), _textcolorStyle, GUILayout.Width(128));
             options.textColor = EditorGUILayout.ColorField((Color) options.textColor, GUILayout.MaxWidth(84));
             GUILayout.EndHorizontal();
             
@@ -234,7 +247,6 @@ namespace Splashdown.Editor
             }
 
             DrawDivider();
-
             
             ApplyRevertGUI();
         }
@@ -245,23 +257,14 @@ namespace Splashdown.Editor
             AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(importer));
             options = null;
         }
-
-
-        private void DrawDefaultInspectorWithoutScript()
+        
+        
+        private void DrawLabelWithText(ref string optionValue, string label, string tooltip, GUIStyle style)
         {
-            serializedObject.Update();
-
-            SerializedProperty iterator = serializedObject.GetIterator();
-            bool enterChildren = true;
-            while (iterator.NextVisible(enterChildren))
-            {
-                enterChildren = false;
-
-                // Skip "m_Script" property
-                if(iterator.propertyPath == "m_Script") continue;
-                EditorGUILayout.PropertyField(iterator, true, new GUILayoutOption[0]);
-            }
-            serializedObject.ApplyModifiedProperties();
+            GUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(new GUIContent(label, tooltip), style, GUILayout.Width(128));
+            optionValue = EditorGUILayout.TextField(optionValue, GUILayout.MaxWidth(84));
+            GUILayout.EndHorizontal();
         }
         
         private void DrawSplashActivationButtons(SplashdownImporter importer, Color originalColor)

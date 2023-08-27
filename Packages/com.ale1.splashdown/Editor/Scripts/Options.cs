@@ -19,7 +19,7 @@ namespace Splashdown.Editor
         public static int DefaultFontSize => DefaultFont.fontSize;
 
         [HideInInspector]
-        public string fileName;
+        public string source;
 
         public SerializableColor backgroundColor;
         public SerializableColor textColor;
@@ -106,6 +106,7 @@ namespace Splashdown.Editor
             fontGUID = other.fontGUID ?? fontGUID;
             TargetFontSize = other.TargetFontSize.hasValue ? other.TargetFontSize : TargetFontSize;
             backgroundTextureGuid = other.backgroundTextureGuid ?? backgroundTextureGuid;
+            source = other.source;
         }
         
         public void ApplyDefaultValues()

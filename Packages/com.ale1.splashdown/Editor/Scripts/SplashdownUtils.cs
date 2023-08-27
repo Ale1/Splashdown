@@ -21,7 +21,6 @@ namespace Splashdown.Editor
             var value = JsonUtility.ToJson(opts);
             EditorPrefs.SetString(key, value);
         }
-        
 
         public static Options GetOptionsFromGuid(string guid)
         {
@@ -162,8 +161,7 @@ namespace Splashdown.Editor
 
             return null; 
         }
-        
-        
+
         public static bool IsNameMatch(string filter, string targetName)
         {
             //when filter is empty, by default we count that as a match.  

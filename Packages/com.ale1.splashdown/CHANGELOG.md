@@ -1,11 +1,14 @@
 # Changelog 
 ## com.ale1.Splashdown
 
+##[1.2.3]
+### Added
+- Wildcard character allowd in splashdown provider attribute filter
+- Improvements to splashdown inspector, showing name of script overriding the options.
 
 ##[1.2.2]
 ### Added
 - Improvements to Splashdown inspector: options overriden by dynamic options will be marked with yellow label
-
 
 ## [1.2.1]
 ### Fixed
@@ -27,7 +30,7 @@
 
 ## [1.0.0]
 ### Changed
-- first preview package in npm
+- first preview package in openUPM
 
 ##[0.9.0]
 ### Added

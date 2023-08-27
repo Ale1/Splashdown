@@ -1,6 +1,6 @@
 {
   "name": "com.ale1.splashdown",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "displayName": "Splashdown",
   "description": "A unity open-source custom Splash splash and Icon generator",
   "documentationUrl": "https://github.com/Ale1/Splashdown",
@@ -8,7 +8,8 @@
   "licenseUrl": "LICENCE.MD",
   "keywords": [
     "Utils",
-    "Coldtower"
+    "Logos",
+    "Icons"
   ],
   "author": {
     "name": "Ale1",

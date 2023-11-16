@@ -11,7 +11,9 @@ jobs:
       matrix:
         projectPath:
           - Packages
-        unityVersion: '2021.3.29f1'
+        unityVersion:
+          - 2021.3.29f1
+          - 2022.3.13f1
         testMode:
           - editmode
     steps:

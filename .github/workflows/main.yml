@@ -39,3 +39,4 @@ jobs:
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           packageMode: true #runs tests on packages rather than main proj
+          unityVersion: ${{ matrix.unityVersion }}

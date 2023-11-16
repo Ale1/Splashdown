@@ -1,6 +1,11 @@
 # Changelog 
 ## com.ale1.Splashdown
 
+
+##[1.3.4]
+### Added
+- some simple unit tests.
+
 ##[1.2.3]
 ### Added
 - Wildcard character allowd in splashdown provider attribute filter

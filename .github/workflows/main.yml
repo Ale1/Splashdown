@@ -10,7 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         projectPath:
-          - Packages
+          - Packages/com.ale1.splashdown
         unityVersion:
           - 2021.3.29f1
           - 2022.3.13f1
@@ -40,3 +40,4 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           packageMode: true #runs tests on packages rather than main proj
           unityVersion: ${{ matrix.unityVersion }}
+          projectPath: ${{ matrix.projectPath }}

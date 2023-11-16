@@ -14,25 +14,26 @@ jobs:
         unityVersion: '2021.3.29f1'
         testMode:
           - editmode
-     steps:
+    steps:
       # Checkout
-        - name: Checkout repository
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           lfs: true
 
-        # Cache
-        - uses: actions/cache@v3
+      # Cache
+      - uses: actions/cache@v3
         with:
           path: Library
           key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
           restore-keys: |
             Library-
+
       # Test
-        - name: Run tests
-          uses: game-ci/unity-test-runner@v4
-          env:
-            UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          with:
-            githubToken: ${{ secrets.GITHUB_TOKEN }}
-            packageMode: true #runs tests on packages rather than main proj
+      - name: Run tests
+        uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          packageMode: true #runs tests on packages rather than main proj

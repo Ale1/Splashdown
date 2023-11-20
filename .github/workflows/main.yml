@@ -33,6 +33,10 @@ jobs:
           key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
           restore-keys: |
             Library-
+        
+        # check license activation
+      - name: Unity - Activate
+        uses: game-ci/unity-activate@v2.0.0
 
       # Test
       - name: Run tests

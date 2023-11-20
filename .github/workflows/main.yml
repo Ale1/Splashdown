@@ -15,7 +15,6 @@ jobs:
           - 2021.3.29f1
           - 2022.3.13f1
         targetPlatform:
-          - iOS
           - Android
         testMode:
           - editmode
@@ -26,21 +25,10 @@ jobs:
         with:
           lfs: true
 
-      # Cache
-      - uses: actions/cache@v3
-        with:
-          path: Library
-          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
-          restore-keys: |
-            Library-
-        
-        # check license activation
-      - name: Unity - Activate
-        uses: game-ci/unity-activate@v2.0.0
-
       # Test
       - name: Run tests
         uses: game-ci/unity-test-runner@v4
+        id: tests
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:

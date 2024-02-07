@@ -160,9 +160,9 @@ Since you can provide options through multiple avenues, keep in mind the order o
 
 (2) CLI Options
 
-(2) Options set manually in inspector
+(3) Options set manually in inspector
 
-(3) Default Options
+(4) Default Options
 
 Options with higher Priority will override ones with lower priority. 
 
@@ -208,7 +208,7 @@ Customizing the border is possible, but the feature is not high-priority in the 
 | --------  | ------------------------ | -------------------------------------------------------------|
 | < 2021.X  | ✖️ not supported         |  will support if error also applies to higher unity versions |   
 | 2021.X    | ✅ supported             |  pls submit issue if encountering problems                   |
-| 2022.X    | ❔ supported (untested)  |  (same as above)                                             |
+| 2022.X    | ✅ supported             |  (same as above)                                             |
 | 2023.X    | ❔ supported (untested)  |  (same as above)                                             |
 
 

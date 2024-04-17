@@ -209,7 +209,7 @@ Customizing the border is possible, but the feature is not high-priority in the 
 | < 2021.X  | ✖️ not supported         |  will support if error also applies to higher unity versions |   
 | 2021.X    | ✅ supported             |  pls submit issue if encountering problems                   |
 | 2022.X    | ✅ supported             |  (same as above)                                             |
-| 2023.X    | ❔ supported (untested)  |  (same as above)                                             |
+| > 2023.X  | ❔ supported (untested)  |  (same as above)                                             |
 
 
 # FAQ

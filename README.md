@@ -45,7 +45,7 @@ Congrats! you generated your first custom Logo/Icon
 
 ## (2) Using it as Splash Logo
 This generated sprite can be used as a logo in your Player Settings.
-By setting hitting `Activate Splash` button, the playerSettings will start using this sprite as its splash image:
+By clicking `Activate Splash` button, the playerSettings will start using this sprite as its splash image:
 
 |![Screenshot 2023-07-30 at 11 42 27](https://github.com/Ale1/Splashdown/assets/4612160/63fa7c90-bde9-4bba-bdae-91d648395565)|
 |:--:| 

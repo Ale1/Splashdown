@@ -1,0 +1,38 @@
+name: Test package
+
+on: [push, pull_request]
+
+jobs:
+  testEditMode:
+    name: Test in ${{matrix.testMode}}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        projectPath:
+          - Packages/com.ale1.splashdown
+        unityVersion:
+          - 2021.3.29f1
+          - 2022.3.13f1
+        targetPlatform:
+          - Android
+        testMode:
+          - editmode
+    steps:
+      # Checkout
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      # Test
+      - name: Run tests
+        uses: game-ci/unity-test-runner@v4
+        id: tests
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          packageMode: true #runs tests on packages rather than main proj
+          unityVersion: ${{ matrix.unityVersion }}
+          projectPath: ${{ matrix.projectPath }}

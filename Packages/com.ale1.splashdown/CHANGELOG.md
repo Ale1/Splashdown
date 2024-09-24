@@ -1,6 +1,12 @@
 # Changelog 
 ## com.ale1.Splashdown
 
+## [1.2.4]
+### Added
+- Test assembly folder in Splashdown package
+### Changed
+- Bumped unity editor version to 2021.3.34
+
 ##[1.2.3]
 ### Added
 - Wildcard character allowd in splashdown provider attribute filter

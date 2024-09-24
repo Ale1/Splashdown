@@ -192,7 +192,6 @@ namespace Splashdown.Editor
             }
             else
             {
-                
                 EditorGUI.BeginDisabledGroup(true);
                 EditorGUILayout.LabelField("Using Font:", $"Splashdown Default ({Constants.DefaultFontName})");
                 EditorGUI.EndDisabledGroup();

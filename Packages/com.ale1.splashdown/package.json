@@ -1,8 +1,8 @@
 {
   "name": "com.ale1.splashdown",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "displayName": "Splashdown",
-  "description": "A unity open-source custom Splash splash and Icon generator",
+  "description": "A unity open-source custom Splash splash and Icon generator.  \nSee https://github.com/Ale1/Splashdown for usage instructions.",
   "documentationUrl": "https://github.com/Ale1/Splashdown",
   "changelogUrl": "CHANGELOG.MD",
   "licenseUrl": "LICENCE.MD",
